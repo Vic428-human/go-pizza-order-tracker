@@ -1,5 +1,10 @@
 package models
 
+import (
+	"gorm.io/gorm"
+)
+
+
 var (
 	OrderStatues = []string{
 		"Order placed",
@@ -21,3 +26,7 @@ var (
 		"Large",
 	}
 )
+
+type OrderModel struct {
+	DB *gorm.DB
+}
