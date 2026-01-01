@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	// := 複製來自 pizza-tracker-go/internal/models 裡的db數據，函數內的修改不影響原先的值
+	
 	dbModel,err := models.InitDB("test.db")
     sum := mathutil.Add(3, 5)
     fmt.Println("結果:", sum)

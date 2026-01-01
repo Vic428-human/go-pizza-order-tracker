@@ -15,7 +15,7 @@ func InitDB(dataSourceName string)(*DBModel, error){
 	// https://zhuanlan.zhihu.com/p/651250516
 	// 第一個參數 Dialector，用來指定數據庫的類型，像是 mysql / sqlite / postgres 等等
 	// db 是由 gorm.Open 回傳的 *gorm.DB 物件
-	db, err := gorm.Open(sqlite.Open(dataSourceName), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(dataSourceName), &gorm.Config{}) // & 表示取址，支持就地修改，如設置日誌或連接池
 	
 	if err != nil {
 		return nil, err
