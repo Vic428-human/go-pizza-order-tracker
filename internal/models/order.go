@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/teris-io/shortid" // https://bbs.itying.com/topic/687b507f4715aa008848880f ex: iNove6iQ9J / NVDve6-9Q
 	"gorm.io/gorm"
 )
 
@@ -86,3 +87,12 @@ type OrderItem struct {
 	Pizza string `gorm:"not null" json:"pizza"`
 	Instructions string `json:"instructions"` 
 }
+
+func (o *Order) BeforeCreate(tx *gorm.DB) error{
+	if(o.ID == "" ){
+		o.ID = shortid.MustGenerate() // 確保 ID 總是生成，若失敗則 panic 中止操作，避免無效記錄插入資料庫
+	}
+	return nil
+}
+
+
