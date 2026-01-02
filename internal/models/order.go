@@ -65,7 +65,7 @@ type OrderModel struct {
 
 // 這裡大寫的ID / Items 其實是欄位名稱
 type Order struct {
-	ID string `gorm:"primaryKey;uniqueIndex;size:14" json:"id"`
+	ID string `gorm:"primaryKey;size:14" json:"id"`
 	Status string `gorm:"not null" json:"status"`
 	CustomerName string `gorm:"not null" json:"customerName"`
 	Phone string `gorm:"not null" json:"phone"`
@@ -77,5 +77,12 @@ type Order struct {
 
 type OrderItem struct {
 	ID string `gorm:"primaryKey;size:14" json:"id"`
-	OrderID string `gorm:"size:14;index" json:"order_id"` // 外鍵，指向 Order.ID
+	// index tag 用途: gorm 在執行 automigrate 或 creteTable 時，自動創建資料庫索引(非唯一)
+	// 加入 index 索引優點:
+	// 1. 查詢訂單(Order)的明細 SELECT * FROM order_items WHERE order_id = 'some_order_id';
+	// 2. 可快速定位紀錄，避免全表搜索
+	OrderID string `gorm:"size:14;index;not null" json:"order_id"` // 外鍵，指向 Order.ID
+	Size string `gorm:"not null" json:"size"`
+	Pizza string `gorm:"not null" json:"pizza"`
+	Instructions string `json:"instructions"` 
 }
