@@ -29,7 +29,6 @@ func RegisterCustomValidators() {
 func createSliceValidator(allowed []string) validator.Func {
 	// 任何符合 func(fl validator.FieldLevel) bool 簽名的函式，就是 validator.Func
 	return func(fl validator.FieldLevel) bool {
-		
 		value := fl.Field().String() // 取得欄位字串值
 		return slices.Contains(allowed, value)
 	}
