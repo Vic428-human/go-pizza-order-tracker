@@ -7,7 +7,7 @@ yourproject/
 │
 ├── internal/ // 私有庫（只能本專案用）
 │ └── model/ // 這裡寫 package model
-│ └── model/ order.go
+│ └── order.go
 │
 │
 │
