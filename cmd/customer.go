@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/gin-gonic/gin"
+)
+
 type OrderFormData struct {
 	PizzaTypes []string
 	PizzaSizes []string
@@ -16,4 +20,8 @@ type OrderRequest struct {
 	Size         string   `json:"size" binding:"required,dive,valid_pizza_size"`
 	PizzaTypes   []string `json:"pizzaTypes" binding:"required,dive,valid_pizza_type"`
 	Instructions string   `json:"instructions" binding:"max=500"`
+}
+
+func (h *Handler) ServiceNewOrderList(c *gin.Context) {
+	c.HTML()
 }
