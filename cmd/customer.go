@@ -17,14 +17,37 @@ type OrderRequest struct {
 	Name         string   `json:"name" binding:"required,min=2,max=100"`
 	Phone        string   `json:"phone" binding:"required, min=10,max=20"`
 	Address      string   `json:"address" binding:"required,min=5,max=200"`
-	Size         string   `json:"size" binding:"required,dive,valid_pizza_size"`
-	PizzaTypes   []string `json:"pizzaTypes" binding:"required,dive,valid_pizza_type"`
-	Instructions string   `json:"instructions" binding:"max=500"`
+	Sizes        []string `form:"size" binding:"required,min=1,dive,valid_pizza_size"`
+	PizzaTypes   []string `form:"pizza" binding:"required,min=1,dive,valid_pizza_type"`
+	Instructions []string `form:"instructions" binding:"max=200"`
 }
+
+
 
 func (h *Handler) ServiceNewOrderList(c *gin.Context) {
 	c.HTML(http.StatusOK, "order.tmpl", OrderFormData{
 		PizzaTypes: models.PizzaTypes,
 		PizzaSizes: models.PizzaSizes,
 	})
+}
+
+func (h *Handler) HandleNewOrderPost(c *gin.Context) {
+	var form OrderRequest
+
+	if err := c.ShouldBind(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 組合訂單明細
+	orderItems := make([]models.OrderItem, len(form.Sizes))
+	for i := range orderItems {
+		orderItems[i] = models.OrderItem{
+			Size:         form.Sizes[i],
+			Pizza:        form.PizzaTypes[i],
+			Instructions: form.Instructions[i],
+		}
+	}
+	
+	
 }
