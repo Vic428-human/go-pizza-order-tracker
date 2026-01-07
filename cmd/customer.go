@@ -38,16 +38,37 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// 組合訂單明細
+	/* 效果:
+	[]models.OrderItem{
+		{
+			Size: "Large",
+			Pizza: "Margherita",
+			Instructions: "",
+		},
+		{
+			Size: "Medium",
+			Pizza: "Pepperoni",
+			Instructions: "",
+		},
+	}
+	
+	*/
+	// 組合訂單明細 : 準備一個清單，裝每一個pizza訂單項目
 	orderItems := make([]models.OrderItem, len(form.Sizes))
-	for i := range orderItems {
-		orderItems[i] = models.OrderItem{
+	for i := range orderItems { // 把 表單的資料，一筆一筆的轉乘 OrderItem struct，將結果塞進 orderItems slice中
+		orderItems[i] = models.OrderItem{ // 用意: 把訂單項目，變成有意義的物件，而不是零散的slice，也方便後續處理
 			Size:         form.Sizes[i],
 			Pizza:        form.PizzaTypes[i],
 			Instructions: form.Instructions[i],
 		}
 	}
 	
+	order := models.Order{
+		Status:       models.OrderStatues[0],
+		CustomerName: form.Name,
+		Phone:        form.Phone,
+		Address:      form.Address,
+		Items:        orderItems,
+	}
 	
 }

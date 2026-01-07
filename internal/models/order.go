@@ -10,7 +10,7 @@ import (
 
 var (
 	OrderStatues = []string{
-		"Order placed",
+		"Order placed", //已下訂單
 		"Preparing",
 		"Baking",
 		"Quality Check",
