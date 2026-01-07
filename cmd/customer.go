@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
+	"os"
 	"pizza-tracker-go/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -70,5 +72,25 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 		Address:      form.Address,
 		Items:        orderItems,
 	}
+
+	// 當前 func 已經跟 Handler 結構體綁定，可以直接透過 h.orders 呼叫 OrderModel 的方法
+	if err := h.orders.CreateOrder(&order); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order"})
+		// 情況1:會多了 time / level等欄位說明
+		// time=2026-01-08T00:23:00.000+08:00 level=ERROR msg="Failed to create order" error="some error message"
+		// err.Error() 會返回具體的錯誤訊息字串放在 error 欄位
+		logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+		logger.Error("處理請求失敗", "error", err.Error())  // 或 slog.Any("error", err)
+
+		// 寫法2 傳統單行，會少了欄位說明: 
+		// slog.Error("Failed to create order", "error", err)
+
+		c.String(http.StatusInternalServerError, "Something went wrong")
+		return
+
+	}
+	slog.Info("Order created", "orderId", order.ID, "customer", order.CustomerName)
+	
+	// 而往下追會發現， OrderModel 結構體也跟 CreateOrder 綁定
 	
 }
