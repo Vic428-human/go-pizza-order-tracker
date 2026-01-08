@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CustomerData struct {
+	Title string
+	Order models.Order
+	Statuses []string
+}
+
 type OrderFormData struct {
 	PizzaTypes []string
 	PizzaSizes []string
@@ -94,4 +100,28 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 	// c.Redirect(statusCode, location)
 	c.Redirect(http.StatusSeeOther, "/customer/" + order.ID)
 	
+}
+
+
+func (h *Handler) serveCustomer(c *gin.Context) {
+
+	// /customer/:id ( 假設:id前端忘了提供)
+	orderID := c.Param("id")
+	if orderID == "" {
+		// 後端回傳
+		c.String(http.StatusBadRequest, "請前端提供訂單ID")
+	}
+	// ( 假設:id 前端有提供，但可能提供的是錯誤的，資料庫找不到讓前端知道)
+	order, err := h.orders.GetOrder(orderID)
+	if err != nil {
+		c.String(http.StatusNotFound, "資料庫中查不到該筆訂單")
+		return
+	}
+
+	// 如果資料庫有訂單，以 tmpl 呈現給前端
+	c.HTML(http.StatusOK, "customer.tmpl", CustomerData{
+		Title: "Pizza Tracker - 訂單詳情"+ order.ID,
+		Order: *order,
+		Statuses: models.OrderStatues,
+	})
 }
