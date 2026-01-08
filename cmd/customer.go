@@ -90,6 +90,8 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 	}
 	slog.Info("Order created", "orderId", order.ID, "customer", order.CustomerName)
 	
-	// 而往下追會發現， OrderModel 結構體也跟 CreateOrder 綁定
+	// 請求的資源可用，並且應該獲取 https://blog.csdn.net/weixin_42073635/article/details/143805554 
+	// c.Redirect(statusCode, location)
+	c.Redirect(http.StatusSeeOther, "/customer/" + order.ID)
 	
 }
