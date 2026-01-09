@@ -1,6 +1,11 @@
 package main
 
-import "os"
+import (
+	"html/template" // 這邊不要用成 text/template，會導致 Gin 無法正確渲染模板 (SetHTMLTemplate)
+	"os"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Config struct {
 	Port   string
@@ -24,4 +29,22 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+
+func loadTemplates(router *gin.Engine) error {
+	functions := template.FuncMap{
+		"add": func(a,b int) int { return a+b},
+	}
+
+	tmpl, err := template.New("").Funcs(functions).ParseGlob("templates/*.tmpl")
+	if err != nil {
+		return err
+	}
+	// Gin 的 SetHTMLTemplate 需要 *html/template.Template
+	// 但你現在用的是 Go 標準庫的 text/template
+	// Gin 的 router.SetHTMLTemplate 明確要求 *html/template.Template，所以你不能傳 *text/template.Template。
+	// 只要把 text/template 換成 html/template
+	router.SetHTMLTemplate(tmpl)
+	return nil
 }
