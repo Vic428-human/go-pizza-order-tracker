@@ -15,7 +15,7 @@ type CustomerData struct {
 	Statuses []string
 }
 
-type OrderFormData struct {
+type OrderFormData struct { // 定義 從 models 取得披薩種類與尺寸的資料 的結構體
 	PizzaTypes []string
 	PizzaSizes []string
 }
@@ -31,10 +31,11 @@ type OrderRequest struct {
 }
 
 
-
-func (h *Handler) ServiceNewOrderList(c *gin.Context) {
+//  tmpl 前端模板
+func (h *Handler) ServeNewOrderForm(c *gin.Context) { // ServeNewOrderForm 屬於 Handler 結構體的方法，用來處理 HTTP 請求。
+	// 回傳一個 HTML 頁面
 	c.HTML(http.StatusOK, "order.tmpl", OrderFormData{
-		PizzaTypes: models.PizzaTypes,
+		PizzaTypes: models.PizzaTypes, // 把 資料包裝成 OrderFormData結構體，然後提供給模板
 		PizzaSizes: models.PizzaSizes,
 	})
 }
