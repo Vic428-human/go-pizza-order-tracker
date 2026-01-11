@@ -23,9 +23,9 @@ func main() {
 		env = "development"
  	}
 
-	if env == "development" { 
+	if env == "development" { // 預設...
 		handler = slog.NewTextHandler(os.Stdout, nil)
-	} else { // 假設都沒設定環境變數，會執行這段
+	} else {  // 其他環境變數的情況
 		handler = slog.NewTextHandler(os.Stdout, opts)
 	}
 	slog.SetDefault(slog.New(handler))
