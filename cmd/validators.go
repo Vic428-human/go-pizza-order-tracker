@@ -1,11 +1,11 @@
-package main // 其他輔助檔案，永遠是用來產生可執行程式的，這些檔案屬於程式的「入口點」
+package main
 
 import (
 	"pizza-tracker-go/internal/models"
 	"slices"
 
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10" // 註冊自訂驗證規則，讓你在模型結構體的欄位標籤（struct tag）中可以使用這些規則來驗證輸入資料是否合法
 )
 
 func RegisterCustomValidators() {
