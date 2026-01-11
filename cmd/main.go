@@ -31,7 +31,11 @@ func main() {
 	slog.SetDefault(slog.New(handler))
 
 	// 1. 先初始化DB，連接DB，接著才處理結構體可以使用tag規則
-	dbModel, err := models.InitDB(cfg.DBPath)
+	// dbModel := &DBModel{ 
+	// 	DB: db, // *gorm.DB 把sqlite的 db gorm物件覆寫
+	// 	Order: OrderModel{DB: db}, // 把sqlite的 db gorm物件覆寫在 OrderModel裡的 DB
+	// }
+	dbModel, err := models.InitDB(cfg.DBPath) 
 	
 	if err != nil {
 		slog.Error("資料庫初始化失敗", "error", err)
@@ -41,4 +45,10 @@ func main() {
 	slog.Info("資料庫連接成功", "path", cfg.DBPath)
 	// 處理結構體可以使用tag規則
 	RegisterCustomValidators()
+
+	// Handler 可以理解成綁定了資料庫跟對應的模組裡的方法
+	h := NewHandler(dbModel) // 因為已經跟資料庫連接所以也綁定 Order 這個欄位
+	// Order這個欄位對應的model結構體是 OrderModel，而OrderModel結構體綁定過的方法都可以跟著使用
+
+	
 }

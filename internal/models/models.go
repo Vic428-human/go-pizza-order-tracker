@@ -7,11 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// type OrderModel struct {
+// 	DB *gorm.DB
+// }
 type DBModel struct {
-	Order OrderModel
-	DB *gorm.DB
+    // 分別是 Order 跟 DB 欄位
+	DB *gorm.DB 
+	Order OrderModel // *gorm.DB
+	
 }
 
+// 接收一個 *DBModel 型別指標
+// DBModel 通常是一個封裝了多個資料模型的結構體，例如 OrderModel、UserModel 等，負責與資料庫互動。
 func InitDB(dataSourceName string)(*DBModel, error){
 	
 	// 第一個參數 Dialector，用來指定數據庫的類型，像是 mysql / sqlite / postgres 等，db 是由 gorm.Open 回傳的 *gorm.DB 物件， https://zhuanlan.zhihu.com/p/651250516
@@ -27,8 +34,8 @@ func InitDB(dataSourceName string)(*DBModel, error){
 	}
 	
 	dbModel := &DBModel{ 
-		DB: db,
-		Order: OrderModel{DB: db},
+		DB: db, // *gorm.DB 把sqlite的 db gorm物件覆寫
+		Order: OrderModel{DB: db}, // 把sqlite的 db gorm物件覆寫在 OrderModel裡的 DB
 	}
 	return dbModel, nil
 
