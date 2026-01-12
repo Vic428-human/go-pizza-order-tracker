@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"os"
 	"pizza-tracker-go/internal/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -47,8 +49,21 @@ func main() {
 	RegisterCustomValidators()
 
 	// Handler 可以理解成綁定了資料庫跟對應的模組裡的方法
-	h := NewHandler(dbModel) // 因為已經跟資料庫連接所以也綁定 Order 這個欄位
-	// Order這個欄位對應的model結構體是 OrderModel，而OrderModel結構體綁定過的方法都可以跟著使用
-
+	h := NewHandler(dbModel) // 因為已經跟資料庫連接所以也綁定 Order 這個欄位，Order這個欄位對應的model結構體是 OrderModel，而OrderModel結構體綁定過的方法都可以跟著使用
 	
+	// gin.Default()是对gin.new()的封装，加入了局日志和错误恢复中间件
+	// Gin 框架在默认情况下设置了全局的日志（logger）和恢复（recovery）中间件。这些中间件对于记录请求信息和恢复从 panic 中恢复的功能是非常有用的
+	router := gin.Default() // https://juejin.cn/post/7325611798136487986
+	if err := loadTemplates(router); err != nil { // 載入模板文件
+		slog.Error("載入模板失敗", "error", err)
+		os.Exit(1)
+	}
+
+	setupRoutes(router, h)
+	// slog.Info("hello, world", "user", os.Getenv("USER"))
+	// 2023/08/04 16:27:19 INFO hello, world user=jba
+	// 下方 => 2025/01/12 16:27:19 INFO 啟動伺服器 url=http
+	slog.Info("啟動伺服器", "url", "http://localhost:8080" + cfg.Port)
+
+	router.Run(":" + cfg.Port)
 }
