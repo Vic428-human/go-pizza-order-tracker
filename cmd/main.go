@@ -63,7 +63,7 @@ func main() {
 	// slog.Info("hello, world", "user", os.Getenv("USER"))
 	// 2023/08/04 16:27:19 INFO hello, world user=jba
 	// 下方 => 2025/01/12 16:27:19 INFO 啟動伺服器 url=http
-	slog.Info("啟動伺服器", "url", "http://localhost:8080" + cfg.Port)
+	slog.Info("Server starting", "url", "http://localhost:"+cfg.Port)
 
 	router.Run(":" + cfg.Port)
 }

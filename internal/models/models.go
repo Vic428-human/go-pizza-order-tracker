@@ -1,9 +1,21 @@
 package models
 
+// 為什麼 github.com/glebarez/sqlite 可以正常執行
+// 這個套件是 純 Go 實作的 SQLite driver。
+// 它不依賴 C 語言的 SQLite 原始程式碼，因此即使 CGO_ENABLED=0（預設在某些環境或 Docker build 中），也能正常編譯與執行。
+// 適合用在需要跨平台、無 CGO 的環境，例如 Docker scratch image 或 serverless。
+
+// 為什麼 gorm.io/driver/sqlite 會失敗
+// gorm.io/driver/sqlite 預設使用的是 github.com/mattn/go-sqlite3 driver。
+// 這個 driver 是 Go 與 SQLite C library 的 binding，需要 CGO 支援。
+// 如果你在 CGO_ENABLED=0 的環境下編譯或執行，就會出現錯誤訊息：
+
 import (
 	"fmt"
+	// https://blog.csdn.net/gitblog_00649/article/details/147110491
+	"github.com/glebarez/sqlite"
 
-	"gorm.io/driver/sqlite"
+	// "gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
