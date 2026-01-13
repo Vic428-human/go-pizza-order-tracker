@@ -2,7 +2,24 @@
 <title>New Pizza order</title>
 </head>
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
-<div>
-	<p>Vic is in the house</p>
+{{/* page container */}}
+<div class="flex item-center justify-center p-6 md:p-8"> 
+	{{/* form container */}}
+	<div class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-xl border border-white max-w-2xl w-full">
+	{{/* tracking-tight: 紧凑的文本 */}}
+		<h1 class="text-4xl font-bold text-gray-900 mb-8 text-center tracking-tight">新的Pizza 訂單</h1>
+		{{/* the url it's should be submit to */}}
+		<form action="/new-order" method="POST" class="space-y-6">
+			<div class="space-y-5">
+				<h2 class="text-xl font-semibold text-gray-800 mb-4">顧客資訊</h2>
+				<div>
+					<label class="block text-gray-700 text-sm font-medium mb-2" for="name">Name</label>
+					<input class="w-full p-2 border-gray-200 rounded-xl focus:outline-none" type="text" name="name" id="name" required minlength="2" maxlength="100"/>
+
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
+
 {{template "bottom" .}}
