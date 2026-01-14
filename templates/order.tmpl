@@ -32,6 +32,27 @@
 				</div>
 				<div id="pizzas" class="space-y-4">
 					<!-- 預期在這邊加入element， 情境: 添加pizza時，添加後的 pizza 清單會出現在這: Pizza #N(數量) remove，以及他對應的大小..等UI，而這個UI就是先前預先製作的版型template -->
+					<!-- 
+					<template id="pizzaTemplate"> // clone的時候這整段會被加進來
+						// 第一個 pizza UI
+						// 刪除的時候下面 pizza-item dom 會被刪除
+						<div class="pizza-item border border-gray-200 rounded-2xl p-5 bg-gray-50/50">
+							<div class="flex ">
+								<h3 class="text-lg">Pizza # <span class="pizza-number"> 每次新增 pizza 前面的序列後會自動遞增 </span>
+								</h3>
+							</div>
+						</div>
+
+						// 第二個 pizza UI
+						// 刪除的時候下面 pizza-item dom 會被刪除
+						<div class="pizza-item ">
+							<div class="flex ">
+								<h3 class="text-lg">Pizza # <span class="pizza-number"> 每次移除，會需要重新計算 pizza 前面的序列編號 </span>
+								</h3>
+							</div>
+						</div>
+					</template> 
+				    -->
 				</div>
 			</div>
 			<button type="submit" class="w-full bg-emerald-500 text-white font-semibold py-3 px-3 rounded-xl hover:bg-emerald-600 active:scale-[0.99] transition-all shadow-emerald-500/30">Place Order</button>
@@ -81,5 +102,20 @@
 		clone.querySelector(".pizza-number").textContent = ++pizzaCount;
 		document.getElementById("pizzas").appendChild(clone);
 	}
+
+	function removePizza(btn){
+		const pizza = btn.closest(".pizza-item").remove(); // 抓出與當前dom最靠近的 pizza-item，將其移除，就能把剛才新增的pizza內容UI給從畫面中刪掉，做到清除dom的效果
+		
+		document.querySelectorAll(".pizza-item").forEach((item,index)=>{
+			item.querySelector(".pizza-number").textContent = index + 1
+		})
+
+		// 計算出刪除後，目前的添加了多少pizzas
+		pizzaCount = document.querySelectorAll(".pizza-item").length;
+	}
+
+	addPizza();
+
+
 </script>
 {{template "bottom" .}}
