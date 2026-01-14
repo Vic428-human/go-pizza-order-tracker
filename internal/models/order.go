@@ -27,6 +27,7 @@ var (
 		"Small",
 		"Medium",
 		"Large",
+		"Extra Large",
 	}
 )
 

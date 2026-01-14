@@ -49,8 +49,22 @@
 		</div>
 		<div class="space-y-4">
 			<div>
-				<label class="block text-gray-700 text-sm font-medium mb-2">Size</label>
-				<select name="size" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-emrald-400 focus:border-transparent transition-all bg-white"></select>
+				<label class="block text-gray-700 text-sm font-medium mb-2">Pizza Sizes</label>
+				<!-- $ => want to access root data -->
+				 <!--  -->
+				<select name="size" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-emrald-400 focus:border-transparent transition-all bg-white">{{range $.PizzaSizes}}<option value="{{.}}">{{.}}</option>{{end}}</select>
+			</div>
+
+			<div>
+				<label class="block text-gray-700 text-sm font-medium mb-2">Pizza Types</label>
+				<!-- $ => want to access root data -->
+				 <!--  -->
+				<select name="pizza" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-emrald-400 focus:border-transparent transition-all bg-white">{{range $.PizzaTypes}}<option value="{{.}}">{{.}}</option>{{end}}</select>
+			</div>
+
+			<div>
+				<label class="block text-gray-700 text-sm font-medium mb-2">特別說明</label>
+				<textarea maxlength="200" name="instractions" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus: border-transparent"></textarea>
 			</div>
 		</div>
 	</div>
