@@ -30,7 +30,9 @@
 					<h2 class="text-xl font-semibold text-gray-800">Pizzas</h2>
 					<button type="button" onclick="addPizza()" class="px-2 py-4 text-sm font-medium text-emerald-600 hover:text-emerald-700 border border-emerald-300 rounded-xl hover:bg-emerald-50 active:scale-95 transition-all">Add Pizza<button>
 				</div>
-				<div id="pizzas" class="space-y-4"></div>
+				<div id="pizzas" class="space-y-4">
+					<!-- 預期在這邊加入element， 情境: 添加pizza時，添加後的 pizza 清單會出現在這: Pizza #N(數量) remove，以及他對應的大小..等UI，而這個UI就是先前預先製作的版型template -->
+				</div>
 			</div>
 			<button type="submit" class="w-full bg-emerald-500 text-white font-semibold py-3 px-3 rounded-xl hover:bg-emerald-600 active:scale-[0.99] transition-all shadow-emerald-500/30">Place Order</button>
 		</form>
@@ -73,10 +75,11 @@
 <script>
 
 	let pizzaCount = 0;
-
-	const clone = document.getElementById("pizzaTemplate").content.cloneNode(true);
-	clone.querySelector(".pizza-number").textContent = ++pizzaCount;
-
 	
+	function addPizza() {
+		const clone = document.getElementById("pizzaTemplate").content.cloneNode(true);
+		clone.querySelector(".pizza-number").textContent = ++pizzaCount;
+		document.getElementById("pizzas").appendChild(clone);
+	}
 </script>
 {{template "bottom" .}}
