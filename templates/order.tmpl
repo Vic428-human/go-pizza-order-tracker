@@ -51,7 +51,7 @@
 			<div>
 				<label class="block text-gray-700 text-sm font-medium mb-2">Pizza Sizes</label>
 				<!-- $ => want to access root data -->
-				 <!--  -->
+				<!--  -->
 				<select name="size" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-emrald-400 focus:border-transparent transition-all bg-white">{{range $.PizzaSizes}}<option value="{{.}}">{{.}}</option>{{end}}</select>
 			</div>
 
@@ -69,4 +69,14 @@
 		</div>
 	</div>
 </template>
+
+<script>
+
+	let pizzaCount = 0;
+
+	const clone = document.getElementById("pizzaTemplate").content.cloneNode(true);
+	clone.querySelector(".pizza-number").textContent = ++pizzaCount;
+
+	
+</script>
 {{template "bottom" .}}
