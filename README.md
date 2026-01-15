@@ -22,3 +22,38 @@ yourproject/
 │
 └── pkg/ // 可重用的公共庫（optional）
 ```
+
+本專案常用指令
+
+```
+<!-- 確定module都有載到在 go.sum -->
+go mod tidy
+<!-- 運行 main.go裡的程序 -->
+go run ./cmd
+```
+
+### 錯誤整理列表
+
+#### Undefined validation function 'min' on field 'Phone'
+
+```
+<!-- 這錯誤跟 binding 的寫法錯誤有關 -->
+<!-- 修正如下 -->
+type OrderRequest struct {
+	Phone        string   `json:"phone" binding:"required,min=10,max=20"`
+}
+```
+
+#### (\*Handler).HandleNewOrderPost: Instructions: form.Instructions[i],
+
+```
+<!--
+1. 表單沒有傳 Instructions ，你的 HTML form 可能沒有包含 Instructions 欄位，或是 name 不對，導致 form.Instructions 沒有值。
+2.Gin 綁定問題 ， 如果你用 c.Bind(&form) 或 c.ShouldBind(&form)，但表單欄位名稱跟 struct tag 不一致，slice 就會是空的。
+解法: 確認 tmpl 跟 結構體的 binding 都有正確綁定
+-->
+type OrderReuqest struct {
+	Instructions []string `form:"instructions" binding:"max=200"`
+}
+<textarea maxlength="200" name="instructions"></textarea>
+```

@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10" // 註冊自訂驗證規則，讓你在模型結構體的欄位標籤（struct tag）中可以使用這些規則來驗證輸入資料是否合法
 )
 
+
 func RegisterCustomValidators() {
     if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 

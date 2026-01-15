@@ -21,15 +21,14 @@ type OrderFormData struct { // 定義 從 models 取得披薩種類與尺寸的�
 }
 
 // dive 是 go-playground/validator 提供的特殊標籤，它用於啟用對 slice/array/map 內部元素的遞歸驗證，若結構體中包含嵌套的切片或數組，且需要驗證其內部字段，必須加上 dive，否則只會驗證外層容器本身（如長度），不會驗證內部元素的字段。
-type OrderRequest struct {
-	Name         string   `json:"name" binding:"required,min=2,max=100"`
-	Phone        string   `json:"phone" binding:"required, min=10,max=20"`
-	Address      string   `json:"address" binding:"required,min=5,max=200"`
+type OrderReuqest struct {
+	Name         string   `form:"name" binding:"required,min=2,max=100"`
+	Phone        string   `form:"phone" binding:"required,min=10,max=20"`
+	Address      string   `form:"address" binding:"required,min=5,max=200"`
 	Sizes        []string `form:"size" binding:"required,min=1,dive,valid_pizza_size"`
 	PizzaTypes   []string `form:"pizza" binding:"required,min=1,dive,valid_pizza_type"`
 	Instructions []string `form:"instructions" binding:"max=200"`
 }
-
 
 //  tmpl 前端模板
 func (h *Handler) ServeNewOrderForm(c *gin.Context) { // ServeNewOrderForm 屬於 Handler 結構體的方法，用來處理 HTTP 請求。
@@ -40,8 +39,9 @@ func (h *Handler) ServeNewOrderForm(c *gin.Context) { // ServeNewOrderForm 屬�
 	})
 }
 
+// Undefined validation function 'min' on field 'Phone' => 這錯誤跟 binding 的寫法錯誤有關
 func (h *Handler) HandleNewOrderPost(c *gin.Context) {
-	var form OrderRequest
+	var form OrderReuqest
 
 	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -21,8 +21,8 @@ var (
 		"Cheese",
 		"Pepperoni",
 		"Veggie",
-	}
-
+	}	
+    // PizzaSizes 可以在 order.tmpl 的時候使用 透過 {{ range .PizzaSizes }}
 	PizzaSizes = []string{
 		"Small",
 		"Medium",
@@ -88,7 +88,7 @@ type OrderItem struct {
 	OrderID string `gorm:"size:14;index;not null" json:"order_id"` // 外鍵，指向 Order.ID
 	Size string `gorm:"not null" json:"size"`
 	Pizza string `gorm:"not null" json:"pizza"`
-	Instructions string `json:"instructions"` 
+	Instructions string `json:"instructions"`
 }
 
 // 在 db.Create() 操作之前，這些 hook 都會自動被呼叫 (hook ex: BeforeCreate / AfterCreate / CreateOrder 等等)
