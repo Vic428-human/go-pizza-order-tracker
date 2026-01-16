@@ -121,7 +121,7 @@ func (h *Handler) serveCustomer(c *gin.Context) {
 
 	// 如果資料庫有訂單，以 tmpl 呈現給前端
 	c.HTML(http.StatusOK, "customer.tmpl", CustomerData{
-		Title: "Pizza Tracker - 訂單詳情"+ order.ID,
+		Title: "Pizza Tracker - 訂單詳情"+ orderID,
 		Order: *order,
 		Statuses: models.OrderStatues,
 	})

@@ -1,9 +1,30 @@
 {{template "top" .}} 
-    <title>Order Status</title>
+{{/* from CustomerData struct  */}}
+    <title>{{.Title}}</title>
+    {{/* for pizza icon */}}
+    <style>
+        @keyframes spin-slow {
+            to { 
+                transform: rotate(360deg);
+            }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 5s linear infinite;
+        }
+    </style>
 </head>
-<body>
-    <div class="mx-w-md mx-auto text-center">
-        <h1 class="text-2xl font-bold mb-4">Order placed Successfully!</h1>
+<!-- min-h-screen 应用场景: 适用于创建占满整个屏幕高度的布局容器，确保内容区域至少与视口等高。 -->
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
+    <div class="flex flex-col item-center p-6 md:p-8">
+        <!-- drop-shadow-lg: 添加一个显著的阴影效果 增强可点击感 -->
+        <img src="/static/pizza.svg" alt="pizza loading ..." class="w-48 h-48 mb-10 animate-spin-slow drop-shadow-lg"> 
+        <!-- backdrop-blur-sm = backdrop-filter: blur(var(--blur-sm)); /* 8px */ 用於讓元素有模糊效果 -->
+        <div id="statusContainer" class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded:3xl shadow-2xl border border-white/20 max-w-3xl w-full"></div>
+        <!-- Tracking utilities control letter spacing, with tracking-tight specifically for a tighter spacing -->
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 text-center tracking-tight">追蹤你的Pizza訂單</h1>
+        <div class="text-lg text-gray-500 mb-10 text-center font-medium">
+            Order #{{.Order.ID}} has been placed and is on its way!
+        </div>
         <p class="text-lg mb-2">Order ID:</p>
         <p class="text-xl font-bold mb-4">{{.Order.ID}}</p>
     </div> 

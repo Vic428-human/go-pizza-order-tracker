@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template" // 這邊不要用成 text/template，會導致 Gin 無法正確渲染模板 (SetHTMLTemplate)
 	"os"
 
@@ -35,6 +37,17 @@ func getEnv(key, defaultValue string) string {
 func loadTemplates(router *gin.Engine) error {
 	functions := template.FuncMap{
 		"add": func(a,b int) int { return a+b},
+		// any = interface{}
+		// return template.JS tells engine do not escape this value
+		// Create a FuncMap to add custom functions (e.g., JSON encoding)
+		"toJSON": func(v interface{}) template.JS { // 參數 v 需要編碼成JSON格式的原始資料，通常是個結構。
+			b, err := json.Marshal(v) // Marshal()會回傳JSON字串([]byte切片)以及error值，如果編碼失敗 error 就不為nil。
+			if err != nil {
+				fmt.Println("Error marshaling:", err)
+			}
+			// https://ithelp.ithome.com.tw/articles/10335017
+			return template.JS(b)
+		},
 	}
 
 	tmpl, err := template.New("").Funcs(functions).ParseGlob("templates/*.tmpl")
