@@ -123,6 +123,7 @@ func (h *Handler) serveCustomer(c *gin.Context) {
 	c.HTML(http.StatusOK, "customer.tmpl", CustomerData{
 		Title: "Pizza Tracker - 訂單詳情"+ orderID,
 		Order: *order,
-		Statuses: models.OrderStatues,
+		Statuses: models.OrderStatues, // {{range $index, $status := .Statuses}} 
+		// .Statuses：代表傳入模板的資料結構中，名為 Statuses 的欄位（通常是一個 slice）
 	})
 }

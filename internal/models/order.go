@@ -9,6 +9,7 @@ import (
 
 
 var (
+	//  {{range $index, $status := .Statuses}}
 	OrderStatues = []string{
 		"Order placed", //已下訂單
 		"Preparing",
