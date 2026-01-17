@@ -57,3 +57,40 @@ type OrderReuqest struct {
 }
 <textarea maxlength="200" name="instructions"></textarea>
 ```
+
+#### Error #01: template: customer.tmpl:42:35: executing "customer.tmpl" at <$index>: wrong type for value; expected int; got string
+
+```
+<!-- , $status 因為當時少寫到這個，所以 "add"引用的時候因為沒寫到 $status 這個字串 ，所以誤把 $index 當成字串了-->
+{{range $index, $status := .Statuses}}
+<div class="flex-1 flex justify-center mx-2">
+    <div id="step{{add $index 1}}"
+        class="size-14 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold tansition-all duration-300 z-10 shadow-md">
+        {{add $index 1}}
+    </div>
+</div>
+{{end}}
+```
+
+### 其他實用技巧
+
+#### 生成 svg 檔案
+
+```
+@"
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <circle cx="50" cy="50" r="45" fill="#FBC02D"/>
+        <circle cx="50" cy="50" r="40" fill="#FFD54F"/>
+        <path d="M50,50 L50,5 A45,45 0 0 1 95,50 Z" fill="#FBC02D"/>
+        <path d="M50,50 L50,10 A40,40 0 0 1 90,50 Z" fill="#FFD54F"/>
+        <circle cx="70" cy="30" r="4" fill="#D84315"/>
+        <circle cx="30" cy="70" r="4" fill="#D84315"/>
+        <circle cx="70" cy="70" r="4" fill="#D84315"/>
+        <circle cx="30" cy="30" r="4" fill="#D84315"/>
+        <circle cx="50" cy="50" r="4" fill="#D84315"/>
+    </g>
+</svg>
+"@ | Out-File -FilePath pizza.svg -Encoding utf8
+
+```
