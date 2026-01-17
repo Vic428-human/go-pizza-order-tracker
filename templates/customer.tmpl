@@ -17,14 +17,13 @@
 <!-- min-h-screen 应用场景: 适用于创建占满整个屏幕高度的布局容器，确保内容区域至少与视口等高。 -->
 
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
-    <div class="flex flex-col item-center p-6 md:p-8">
+    <div class="flex flex-col items-center p-6 md:p-8">
         <!-- drop-shadow-lg: 添加一个显著的阴影效果 增强可点击感 -->
         <img src="/static/pizza.svg" alt="pizza loading ..." class="w-48 h-48 mb-10 animate-spin-slow drop-shadow-lg">
         <!-- backdrop-blur-sm = backdrop-filter: blur(var(--blur-sm)); /* 8px */ 用於讓元素有模糊效果 -->
         <div id="statusContainer"
             class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded:3xl shadow-2xl border border-white/20 max-w-3xl w-full">
-        </div>
-        <!-- Tracking utilities control letter spacing, with tracking-tight specifically for a tighter spacing -->
+                    <!-- Tracking utilities control letter spacing, with tracking-tight specifically for a tighter spacing -->
         <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 text-center tracking-tight">追蹤你的Pizza訂單</h1>
         <div class="text-lg text-gray-500 mb-10 text-center font-medium">
             Order #{{.Order.ID}} has been placed and is on its way!
@@ -39,7 +38,8 @@
             <div class="flex-1 flex justify-center mx-2">
                 <!-- Go template 中，這是插值語法，表示要執行裡面的指令或函式，並將結果輸出到模板，先前有定義過 add template function -->
                 <!-- tansition: 指定哪些 CSS 属性的变化应该被平滑地过渡（即产生动画效果）。如果没有指定这个属性，浏览器通常只会对某些默认属性（比如颜色、不透明度、变换）进行过渡 -->
-                <div id="step{{add $index 1}}"
+                <!-- 待會會取出當前的 step 參考 updateStatusBar-->
+                <div id="step{{add $index 1}}" 
                     class="size-14 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold tansition-all duration-300 z-10 shadow-md">
                     {{add $index 1}}
                 </div>
@@ -102,5 +102,33 @@
                 {{end}}
             </div>
         </div>
+        </div>
+
     </div>
+    <script>
+        // ['pending', 'preparing', 'out-for-delivery', 'delivered']
+        const statuses = {{toJSON .Statuses}};
+
+        function updateStatusBar(currentStatus){
+            const currentIndex = statuses.indexOf(currentStatus)
+            
+            statuses.forEach((status, index)=>{
+                const step = document.getElementById(`step${index+1}`); //透過 element id拿到當前處在哪一步
+                
+                // step${index+1} 這個元素，原先背景色是 灰色，把灰色取消，然後加入綠色，呈現現在已經有該進度條
+                if(index <= currentIndex){
+                    step.classList.remove('bg-gray-300')
+                    step.classList.add('bg-emerald-500')
+                }
+                const progressLine = document.getElemnetById('progressLine');
+                // 製作百分比，當還沒有進度的時候也要呈現出一點綠色
+                const progressPercentage = Math.max(currentIndex, (statuses.length-1)*100,5)
+                // 透過進度條百分比，改變styling的方式去顯示綠色進度條的效果
+                // linear-gradient 用法: https://ithelp.ithome.com.tw/articles/10275753
+                // 0%~50% 是 #10b981 50%~最後% 是 #e5e7eb
+                progressLine.style.background = `linear-gradient(to right, #10b981 ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`
+            })
+        }
+        updateStatusBar("{{.Order.Status}}") // type CustomerData struc
+    </script>
     {{template "bottom" .}}
