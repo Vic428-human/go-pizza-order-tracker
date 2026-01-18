@@ -28,7 +28,7 @@ yourproject/
 輸入 sqlite3 確認是否出現下方訊息，有的話代表有安裝sqlite cli
 <!-- https://sqlite.org/download.html -->
 <!-- 本專案使用的是 sqlite-tools-osx-x64-351020zip 沒有  ARM的那個版本  -->
-<!-- 並且要記得設定環境變數，解壓縮後，改黨名sqlite，然後複製檔案路徑，貼到PATH重啟vscode，輸入 sqlite3 有出現下方就代表安裝成功-->
+<!-- 並且要記得設定環境變數，解壓縮後，改黨名sqlite，然後複製檔案路徑，貼到PATH重啟vscode，輸入 sqlite3 有出現下方就代表安裝成功 -->
 SQLite version 3.51.2 2026-01-09 17:27:48
 Enter ".help" for usage hints.
 Connected to a transient in-memory database.
@@ -44,6 +44,8 @@ go mod tidy
 go run ./cmd
 <!-- 查看DB -->
 sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
+<!-- 直接對DB寫入，像是修改特定欄位的值 -->
+sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='AcgaEMSDR';" 
 ```
 
 ### 錯誤整理列表
