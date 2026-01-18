@@ -10,8 +10,8 @@ import (
 )
 
 type CustomerData struct {
-	Title string
-	Order models.Order
+	Title    string
+	Order    models.Order
 	Statuses []string
 }
 
@@ -30,7 +30,7 @@ type OrderReuqest struct {
 	Instructions []string `form:"instructions" binding:"max=200"`
 }
 
-//  tmpl 前端模板
+// tmpl 前端模板
 func (h *Handler) ServeNewOrderForm(c *gin.Context) { // ServeNewOrderForm 屬於 Handler 結構體的方法，用來處理 HTTP 請求。
 	// 回傳一個 HTML 頁面
 	c.HTML(http.StatusOK, "order.tmpl", OrderFormData{
@@ -60,7 +60,7 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 			Instructions: "",
 		},
 	}
-	
+
 	*/
 	// 組合訂單明細 : 準備一個清單，裝每一個pizza訂單項目
 	orderItems := make([]models.OrderItem, len(form.Sizes))
@@ -71,7 +71,7 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 			Instructions: form.Instructions[i],
 		}
 	}
-	
+
 	order := models.Order{
 		Status:       models.OrderStatues[0],
 		CustomerName: form.Name,
@@ -87,22 +87,21 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 		// time=2026-01-08T00:23:00.000+08:00 level=ERROR msg="Failed to create order" error="some error message"
 		// err.Error() 會返回具體的錯誤訊息字串放在 error 欄位
 		logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-		logger.Error("處理請求失敗", "error", err.Error())  // 或 slog.Any("error", err)
+		logger.Error("處理請求失敗", "error", err.Error()) // 或 slog.Any("error", err)
 
-		// 寫法2 傳統單行，會少了欄位說明: 
+		// 寫法2 傳統單行，會少了欄位說明:
 		// slog.Error("Failed to create order", "error", err)
 
 		c.String(http.StatusInternalServerError, "Something went wrong")
 		return
 	}
 	slog.Info("Order created", "orderId", order.ID, "customer", order.CustomerName)
-	
-	// 請求的資源可用，並且應該獲取 https://blog.csdn.net/weixin_42073635/article/details/143805554 
-	// c.Redirect(statusCode, location)
-	c.Redirect(http.StatusSeeOther, "/customer/" + order.ID)
-	
-}
 
+	// 請求的資源可用，並且應該獲取 https://blog.csdn.net/weixin_42073635/article/details/143805554
+	// c.Redirect(statusCode, location)
+	c.Redirect(http.StatusSeeOther, "/customer/"+order.ID)
+
+}
 
 func (h *Handler) serveCustomer(c *gin.Context) {
 
@@ -121,9 +120,9 @@ func (h *Handler) serveCustomer(c *gin.Context) {
 
 	// 如果資料庫有訂單，以 tmpl 呈現給前端
 	c.HTML(http.StatusOK, "customer.tmpl", CustomerData{
-		Title: "Pizza Tracker - 訂單詳情"+ orderID,
-		Order: *order,
-		Statuses: models.OrderStatues, // {{range $index, $status := .Statuses}} 
+		Title:    "Pizza Tracker - 訂單詳情" + orderID,
+		Order:    *order,
+		Statuses: models.OrderStatues, // {{range $index, $status := .Statuses}}
 		// .Statuses：代表傳入模板的資料結構中，名為 Statuses 的欄位（通常是一個 slice）
 	})
 }

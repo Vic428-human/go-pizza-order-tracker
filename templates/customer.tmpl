@@ -30,21 +30,18 @@
         </div>
         <div class="relative flex justify-between items-center mb-4">
             <!-- -translate-y-1/2 : https://tailwindcss.com/docs/translate : 往左往上各50% -->
-            <div id="progressLine" class="absolute inset-x-[30px] h-1.5 bg-gray-200 -translate-y-1/2 rounded-full">
-            </div>
+             <div id="progressLine"
+                    class="absolute inset-x-[30px] h-1.5 bg-gray-200 top-1/2 -translate-y-1/2 rounded-full"></div>
             <!-- range : 它會遍歷一個 slice、array、map 或 channel。 -->
             <!-- justify-center 集中在主軸 -->
-            {{range $index, $status := .Statuses}}
-            <div class="flex-1 flex justify-center mx-2">
-                <!-- Go template 中，這是插值語法，表示要執行裡面的指令或函式，並將結果輸出到模板，先前有定義過 add template function -->
-                <!-- tansition: 指定哪些 CSS 属性的变化应该被平滑地过渡（即产生动画效果）。如果没有指定这个属性，浏览器通常只会对某些默认属性（比如颜色、不透明度、变换）进行过渡 -->
-                <!-- 待會會取出當前的 step 參考 updateStatusBar-->
-                <div id="step{{add $index 1}}" 
-                    class="size-14 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold tansition-all duration-300 z-10 shadow-md">
-                    {{add $index 1}}
+             {{range $index, $status := .Statuses}}
+                <div class="flex-1 flex justify-center relative mx-2">
+                    <div id="step{{add $index 1}}"
+                        class="size-14 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 z-10 shadow-md">
+                        {{add $index 1}}
+                    </div>
                 </div>
-            </div>
-            {{end}}
+                {{end}}
         </div>
         <div class="flex justify-between text-sm text-gray-700 mb-10 font-semibold">
             {{range .Statuses}}
@@ -120,15 +117,15 @@
                     step.classList.remove('bg-gray-300')
                     step.classList.add('bg-emerald-500')
                 }
-                const progressLine = document.getElemnetById('progressLine');
-                // 製作百分比，當還沒有進度的時候也要呈現出一點綠色
-                const progressPercentage = Math.max(currentIndex, (statuses.length-1)*100,5)
-                // 透過進度條百分比，改變styling的方式去顯示綠色進度條的效果
-                // linear-gradient 用法: https://ithelp.ithome.com.tw/articles/10275753
-                // 0%~50% 是 #10b981 50%~最後% 是 #e5e7eb
-                progressLine.style.background = `linear-gradient(to right, #10b981 ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`
-            })
+            })      
+            const progressLine = document.getElemnetById('progressLine');
+            // 製作百分比，當還沒有進度的時候也要呈現出一點綠色
+            const progressPercentage = Math.max(currentIndex, (statuses.length-1)*100,5)
+            // 透過進度條百分比，改變styling的方式去顯示綠色進度條的效果
+            // linear-gradient 用法: https://ithelp.ithome.com.tw/articles/10275753
+            // 0%~50% 是 #10b981 50%~最後% 是 #e5e7eb
+            progressLine.style.background = `linear-gradient(to right, #10b981 ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`         
         }
-        updateStatusBar("{{.Order.Status}}") // type CustomerData struc
+        updateStatusBar("{{.Order.Status}}")
     </script>
     {{template "bottom" .}}
