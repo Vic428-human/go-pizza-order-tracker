@@ -23,13 +23,27 @@ yourproject/
 └── pkg/ // 可重用的公共庫（optional）
 ```
 
-本專案常用指令
+### 啟用專案
+```
+輸入 sqlite3 確認是否出現下方訊息，有的話代表有安裝sqlite cli
+<!-- https://sqlite.org/download.html -->
+<!-- 本專案使用的是 sqlite-tools-osx-x64-351020zip 沒有  ARM的那個版本  -->
+<!-- 並且要記得設定環境變數，解壓縮後，改黨名sqlite，然後複製檔案路徑，貼到PATH重啟vscode，輸入 sqlite3 有出現下方就代表安裝成功-->
+SQLite version 3.51.2 2026-01-09 17:27:48
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+```
+
+### 本專案常用指令
 
 ```
 <!-- 確定module都有載到在 go.sum -->
 go mod tidy
 <!-- 運行 main.go裡的程序 -->
 go run ./cmd
+<!-- 查看DB -->
+sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
 ```
 
 ### 錯誤整理列表
