@@ -1,20 +1,29 @@
 package models
 
-// 為什麼 github.com/glebarez/sqlite 可以正常執行
-// 這個套件是 純 Go 實作的 SQLite driver。
-// 它不依賴 C 語言的 SQLite 原始程式碼，因此即使 CGO_ENABLED=0（預設在某些環境或 Docker build 中），也能正常編譯與執行。
-// 適合用在需要跨平台、無 CGO 的環境，例如 Docker scratch image 或 serverless。
+/*
+來源: https://github.com/glebarez/sqlite?tab=readme-ov-file#how-is-this-better-than-standard-gorm-sqlite-driver
+基於 cgo：官方的 gorm.io/driver/sqlite 是透過 Go 與 SQLite C 原始碼的綁定（cgo）。
+限制：
+需要安裝 C 編譯器才能編譯與執行程式。
+SQLite 的某些功能（例如 JSON 支援）必須在編譯時啟用，因此每次執行 go run、go test 等指令時都要加上正確的 build tags。
+因為需要 C 編譯器，無法在精簡的容器（例如 golang-alpine）中建置。
+在 GCP（Google Cloud Platform）上無法建置，因為 GCP 不允許執行 gcc。
 
-// 為什麼 gorm.io/driver/sqlite 會失敗
-// gorm.io/driver/sqlite 預設使用的是 github.com/mattn/go-sqlite3 driver。
-// 這個 driver 是 Go 與 SQLite C library 的 binding，需要 CGO 支援。
-// 如果你在 CGO_ENABLED=0 的環境下編譯或執行，就會出現錯誤訊息：
+glebarez/sqlite 的優勢
+純 Go 實作：這個 driver 基於 cznic/sqlite，它是將 SQLite C 原始碼 AST 轉換成 Go 程式碼。
+
+好處：
+不需要 C 編譯器，跨平台部署更方便。
+可以在精簡容器（如 golang-alpine）或 GCP 上使用。
+本質上仍是原始 SQLite 的邏輯，只是用 Go 語言重寫。
+*/
 
 import (
 	"fmt"
+	// sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
 	// https://blog.csdn.net/gitblog_00649/article/details/147110491
 	"github.com/glebarez/sqlite"
-
+	// 不論是 gorm.io/driver/sqlite 還是 github.com/glebarez/sqlite，生成的 .db 檔案都能用 sqlite3 -header -column data/orders.db "SELECT * FROM orders;" 查詢。差別只在 Go driver 的實作方式，跟 CLI 指令無關。
 	// "gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
