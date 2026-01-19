@@ -35,6 +35,11 @@ Connected to a transient in-memory database.
 Use ".open FILENAME" to reopen on a persistent database.
 ```
 
+### 常見符號
+```
+& 表示取址，支持就地修改，如設置日誌或連接池
+```
+
 ### 本專案常用指令
 
 ```
@@ -49,6 +54,20 @@ sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='aULpvdI
 ```
 
 ### 錯誤整理列表
+
+####  Error: in prepare, no such table XXX
+```
+<!-- 表示 models結構體尚未定義在 Automigrate，導致資料表不能更新，把 User{} 放在 AutoMigrate 裡即可。-->
+	
+err = db.AutoMigrate(&Order{}, &OrderItem{}, &User{})
+
+type User struct { 
+	ID       string `gorm:"primaryKey"`
+	Username string `gorm:"uniqueIndex;not null"`
+	Password string `gorm:"not null"`
+}
+err = db.AutoMigrate(&Order{}, &OrderItem{}, &User{})
+```
 
 #### Undefined validation function 'min' on field 'Phone'
 
