@@ -45,7 +45,7 @@ go run ./cmd
 <!-- 查看DB -->
 sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
 <!-- 直接對DB寫入，像是修改特定欄位的值 -->
-sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='AcgaEMSDR';" 
+sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='aULpvdIDR';" 
 ```
 
 ### 錯誤整理列表
