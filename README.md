@@ -40,17 +40,27 @@ Use ".open FILENAME" to reopen on a persistent database.
 & 表示取址，支持就地修改，如設置日誌或連接池
 ```
 
-### 本專案常用指令
+### 專案常用指令
 
 ```
 <!-- 確定module都有載到在 go.sum -->
 go mod tidy
-<!-- 運行 main.go裡的程序 -->
+
+<!-- 運行 main.go 裡的程序，如果不先運行是無法對DB Table進行資料修改的 -->
 go run ./cmd
-<!-- 查看DB -->
+
+<!-- 查看 orders 的 DB -->
 sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
-<!-- 直接對DB寫入，像是修改特定欄位的值 -->
+
+<!-- 對 orders 的 DB Table 寫入，修改特定欄位的資料 -->
 sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='aULpvdIDR';" 
+
+<!-- 對 users 的 DB Table 插入新的資料 -->
+sqlite3 data/orders.db "INSERT INTO users (username, password) VALUES('admin', '\$2a\$12\$ZyZgQMjHvs41bMEX0i82jeqeWfz08Q9Vusx./QQJTNkfh2QWGLRa6');"
+
+<!-- 查看 users 的 DB Table的內容 -->
+sqlite3 -header -column data/orders.db "SELECT * FROM users;"
+
 ```
 
 ### 錯誤整理列表
