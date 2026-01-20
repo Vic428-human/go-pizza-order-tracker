@@ -8,7 +8,7 @@ import (
 )
 
 type User struct { // 定義一個 User struct，對應到資料庫中的 users table。
-	ID       string `gorm:"primaryKey"`
+	ID       uint   `gorm:"primaryKey"`
 	Username string `gorm:"uniqueIndex;not null"`
 	Password string `gorm:"not null"`
 }
