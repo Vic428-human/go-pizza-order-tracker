@@ -1,4 +1,4 @@
-### 檔案架構
+### 檔案架構:
 
 ```code
 yourproject/
@@ -20,7 +20,7 @@ yourproject/
 └── pkg/ // 可重用的公共庫（optional）
 ```
 
-### 啟用專案
+### 啟用專案:
 ```
 輸入 sqlite3 確認是否出現下方訊息，有的話代表有安裝sqlite cli
 <!-- https://sqlite.org/download.html -->
@@ -32,12 +32,51 @@ Connected to a transient in-memory database.
 Use ".open FILENAME" to reopen on a persistent database.
 ```
 
+### 登入整體流程圖: /login Router → Handler → Model → DB
+> 避免使用者反覆輸入帳號、密碼而產生的機制
+```
++-------------------+
+|      Router       |
++-------------------+
+| + POST("/login", HandleLoginPost) |  => Router 綁定到 Handler 的方法
++-------------------+
++-------------------+
+|      Handler      | => cmd/handlers.go => 是一個中介層，負責處理路由進來的請求。它本身持有不同的 Model（例如 UserModel、OrderModel），並透過這些 Model 來執行資料存取或商業邏輯。
++-------------------+
+| - users: UserModel| => 呼叫對應的 Model (users欄位)
++-------------------+
+| + HandleLoginPost(c: gin.Context) | => 1.對登入資訊加鹽 2.透過user.ID + user.Username存到 Session (為了避免使用者反覆輸入帳號、密碼而產生的機制)
++-------------------+
+            |
+            | users  => 每個 Model 對應到資料庫中的某個領域（例如使用者、訂單），並且封裝了該領域的操作方法（例如 AuthenticateUser 用來驗證使用者）。
+            ▼
++-------------------+
+|    UserModel      | => h.users.AuthenticateUser
++-------------------+
+| - DB: *gorm.DB    | => Model 封裝了資料庫操作邏輯
++-------------------+
+| + AuthenticateUser(username: string, password: string): User | => 驗證使用者的操作方法，先接收username跟password然後對資料庫操作。
++-------------------+
+            |
+            | returns => 回傳加密後的使用者資訊
+            ▼
++-------------------+
+|       User        |
++-------------------+
+| - ID: int         |
+| - Username: string|
+| - Password: string|
++-------------------+
+
+```
+
+
 ### 常見符號
 ```
 & 表示取址，支持就地修改，如設置日誌或連接池
 ```
 
-### 專案常用指令
+### 常用指令
 
 ```
 <!-- 確定module都有載到在 go.sum -->
@@ -62,7 +101,7 @@ sqlite3 -header -column data/orders.db "SELECT * FROM users;"
 sqlite3 data/orders.db "INSERT OR REPLACE INTO users (username, password) VALUES('admin', '$2a$12$7Fy63im5z3jHEDn08hQbzevdLJIkDOgi52S79B58nplylten5QKtq');"
 ```
 
-### 錯誤整理列表
+### 錯誤訊息快速查找
 
 ####  Error: in prepare, no such table XXX
 ```
@@ -139,8 +178,8 @@ type OrderReuqest struct {
 
 ```
 
-#### Gin Middleware 執行順序說明 (gin.HandlerFunc 範例)
-> 下方這個簡易的代碼流向，是方便日後回顧可以快速理解當時設計登入驗證成功失敗導轉的邏輯構想
+#### Gin Middleware (gin.HandlerFunc 範例)
+> 透過session是否存在，來決定Redirect的路徑，對於網頁來說，會有區分登入後才能觀看的，跟沒有登入時也能觀看的頁面，下方的架構主要就是在實踐這一塊。
 
 - **全域 Middleware (LoggerMiddleware)**
   - 請求進來時先記錄 `Request Path`
@@ -233,55 +272,4 @@ func main() {
 }
 ```
 
-```
-+-------------------+
-|      Handler      |
-+-------------------+
-| - orders: OrderModel
-| - users: UserModel
-| - notificationManager: NotificationManager
-+-------------------+
-| + HandleLoginPost(c: gin.Context) |
-+-------------------+
-            |
-            | uses
-            ▼
-+-------------------+
-|    UserModel      |
-+-------------------+
-| - DB: *gorm.DB    |
-+-------------------+
-| + AuthenticateUser(username: string, password: string): User |
-+-------------------+
-            |
-            | returns
-            ▼
-+-------------------+
-|       User        |
-+-------------------+
-| - ID: int         |
-| - Username: string|
-| - Password: string|
-+-------------------+
 
-+-------------------+
-|    OrderModel     |
-+-------------------+
-| - DB: *gorm.DB    |
-+-------------------+
-| + (methods for orders...) |
-+-------------------+
-
-+-------------------+
-| NotificationManager|
-+-------------------+
-| + (methods for notifications...) |
-+-------------------+
-
-+-------------------+
-|      Router       |
-+-------------------+
-| + POST("/login", HandleLoginPost) |
-+-------------------+
-
-```
