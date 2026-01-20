@@ -232,3 +232,56 @@ func main() {
     r.Run(":8080")
 }
 ```
+
+```
++-------------------+
+|      Handler      |
++-------------------+
+| - orders: OrderModel
+| - users: UserModel
+| - notificationManager: NotificationManager
++-------------------+
+| + HandleLoginPost(c: gin.Context) |
++-------------------+
+            |
+            | uses
+            ▼
++-------------------+
+|    UserModel      |
++-------------------+
+| - DB: *gorm.DB    |
++-------------------+
+| + AuthenticateUser(username: string, password: string): User |
++-------------------+
+            |
+            | returns
+            ▼
++-------------------+
+|       User        |
++-------------------+
+| - ID: int         |
+| - Username: string|
+| - Password: string|
++-------------------+
+
++-------------------+
+|    OrderModel     |
++-------------------+
+| - DB: *gorm.DB    |
++-------------------+
+| + (methods for orders...) |
++-------------------+
+
++-------------------+
+| NotificationManager|
++-------------------+
+| + (methods for notifications...) |
++-------------------+
+
++-------------------+
+|      Router       |
++-------------------+
+| + POST("/login", HandleLoginPost) |
++-------------------+
+
+```

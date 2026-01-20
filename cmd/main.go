@@ -59,7 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// router.Use	(LoggerMiddleware()) // Apply middleware globally
+	// router.Use(LoggerMiddleware()) // Apply middleware globally
 
 	setupRoutes(router, h)
 	// slog.Info("hello, world", "user", os.Getenv("USER"))
