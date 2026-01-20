@@ -53,11 +53,13 @@ sqlite3 -header -column data/orders.db "SELECT * FROM orders;"
 sqlite3 data/orders.db "UPDATE orders SET status = 'Preparing' WHERE id='aULpvdIDR';" 
 
 <!-- 對 users 的 DB Table 插入新的資料 -->
-sqlite3 data/orders.db "INSERT INTO users (username, password) VALUES('admin', '\$2a\$12\$ZyZgQMjHvs41bMEX0i82jeqeWfz08Q9Vusx./QQJTNkfh2QWGLRa6');"
+sqlite3 data/orders.db "INSERT INTO users (username, password) VALUES('admin', '$2a$12$7Fy63im5z3jHEDn08hQbzevdLJIkDOgi52S79B58nplylten5QKtq');"
 
 <!-- 查看 users 的 DB Table的內容 -->
 sqlite3 -header -column data/orders.db "SELECT * FROM users;"
 
+<!-- 覆寫特定欄位對應的Value (bash模式下才可以看到完整的密碼，由於太長的關係，powershell看不到完整的密碼) -->
+sqlite3 data/orders.db "INSERT OR REPLACE INTO users (username, password) VALUES('admin', '$2a$12$7Fy63im5z3jHEDn08hQbzevdLJIkDOgi52S79B58nplylten5QKtq');"
 ```
 
 ### 錯誤整理列表
