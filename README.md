@@ -138,3 +138,94 @@ type OrderReuqest struct {
 "@ | Out-File -FilePath pizza.svg -Encoding utf8
 
 ```
+
+#### Gin Middleware 執行順序說明 (gin.HandlerFunc 範例)
+> 下方這個簡易的代碼流向，是方便日後回顧可以快速理解當時設計登入驗證成功失敗導轉的邏輯構想
+
+- **全域 Middleware (LoggerMiddleware)**
+  - 請求進來時先記錄 `Request Path`
+
+- **路由群組 Middleware (AuthMiddleware)**
+  - 如果是 `/admin` 路由，會先檢查使用者是否登入
+  - **沒登入** → Redirect `/login` 並中斷
+  - **登入成功** → 繼續執行下一個 Handler
+
+- **Handler**
+  - `ServeAdminDashboard`：顯示後台首頁
+  - `HandleOrderPut`：更新訂單資訊
+
+- **全域 Middleware (LoggerMiddleware After)**
+  - Handler 執行完畢後，再記錄 `Response Status`
+
+```
+// cmd/middleware.go
+func (h *Handler) AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // [步驟 1] 進入 /admin 路由群組時，先執行 AuthMiddleware
+
+        userID := GetSessionString(c, "userID")
+
+        <!-- 沒登入 → Redirect /login 並中斷。 -->
+        if userID == "" {
+            // [步驟 2] 如果沒有 userID，導向 /login 並中斷後續流程
+            c.Redirect(http.StatusSeeOther, "/login")
+            c.Abort()
+            return
+        }
+
+        _, err := h.users.GetUserByID(userID)
+        if err != nil {
+            // [步驟 3] 如果 userID 無效，清除 session，導向 /login 並中斷
+            ClearSession(c)
+            c.Redirect(http.StatusSeeOther, "/login")
+            c.Abort()
+            return
+        }
+        <!-- 登入成功 → 繼續。 -->
+        // [步驟 4] 驗證成功，繼續執行下一個 Handler
+        c.Next()
+    }
+}
+
+// cmd/routes.go
+func setupRoutes(router *gin.Engine, h *Handler) {
+
+    admin := router.Group("/admin")
+    admin.Use(h.AuthMiddleware()) // [步驟 A] 進入 /admin 路由前，會先跑 AuthMiddleware
+    {
+        // [步驟 B] 如果通過驗證(登入成功後)，才會執行以下 Handler
+        admin.GET("", h.ServeAdminDashboard)       // 顯示後台首頁
+        admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
+    }
+}
+
+
+// cmd/main.go 
+func LoggerMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // [步驟 0-前] 全域 Middleware：請求進來時先印出 Request path
+        println("Request path:", c.Request.URL.Path)
+
+        c.Next() // [步驟 0-中] 繼續執行後續 Middleware / Handler
+
+        // [步驟 0-後] Handler 執行完畢後，再印出 Response status
+        println("Response status:", c.Writer.Status())
+    }
+}
+
+
+// cmd/main.go
+func main() {
+    r := gin.Default()
+
+    // [第一層] 全域 Middleware：LoggerMiddleware
+    r.Use(LoggerMiddleware()) 
+
+    h := NewHandler(dbModel)
+    // [第二層] 設定路由，/admin 路由會套用 AuthMiddleware
+    setupRoutes(r,h) 
+
+    // [最後] 啟動伺服器，開始監聽請求
+    r.Run(":8080")
+}
+```
