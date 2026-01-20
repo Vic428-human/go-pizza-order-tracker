@@ -16,7 +16,7 @@ type Config struct {
 
 func loadConfig() Config {
 	return Config{
-		Port:   getEnv("PORT", "8080"), // 定義key 跟 value 
+		Port:   getEnv("PORT", "8080"), // 定義key 跟 value
 		DBPath: getEnv("DATABASE_URL", "./data/orders.db"),
 	}
 }
@@ -26,17 +26,16 @@ func loadConfig() Config {
 // Retrieve the newly set variable
 // fmt.Println("NEW_VAR =", os.Getenv("NEW_VAR")) => NEW_VAR = GoLang Rocks!
 func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key); 
-	if(value != "") {
+	value := os.Getenv(key)
+	if value != "" {
 		return value
 	}
 	return defaultValue
 }
 
-
 func loadTemplates(router *gin.Engine) error {
 	functions := template.FuncMap{
-		"add": func(a,b int) int { return a+b},
+		"add": func(a, b int) int { return a + b },
 		// any = interface{}
 		// return template.JS tells engine do not escape this value
 		// Create a FuncMap to add custom functions (e.g., JSON encoding)
@@ -60,4 +59,11 @@ func loadTemplates(router *gin.Engine) error {
 	// 只要把 text/template 換成 html/template
 	router.SetHTMLTemplate(tmpl)
 	return nil
+}
+
+// 設置 session
+
+// 獲取 session
+func GetSessionString() string {
+	return ""
 }

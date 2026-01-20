@@ -3,20 +3,22 @@
 ```code
 yourproject/
 ├── go.mod
-├── cmd/
+├── cmd/ // 每個子資料夾通常對應一個可執行檔，Handler 與 Middleware 屬於「應用程式入口」的一部分，Handler 是路由對應的邏輯處理器。
 │ ├── handler.go // 集中管理業務邏輯，工廠函式，也易於外來測試，或是更換其他DB等使用
 │ ├── main.go // 主程序，處理初始化db、結構體驗證規則，透過go-playground
 │ ├── customer.go // 顧客訂單查詢、顯示訂單、創建訂單等業務邏輯規劃
 │ ├── routes.go  // 規劃後端endpoint路由，透過 handler 綁定相關邏輯
-│ ├── utils.go // 載入環境變數，例如引用db路徑或是port等資訊調用，並透過 html/template 套件處理資料的引用
+│ ├── utils.go // 載入環境變數，例如引用db路徑或是port等資訊調用，並透過 html/│   template 套件處理資料的引用
 │ └── validators.go // 其他輔助檔案 : 定義驗證規則，不管前端傳甚麼給後端，都會多層過
-│
+│ └── routes.go // 應用程式層級的邏輯
+│ └──main.go // 應用程式層級的邏輯
 濾驗證，確保傳的內容符合規格定義的種類
 │
 ├── internal/   // 私有庫（只能本專案用）
 │ └── model/    // 在這定義結構體變數跟業務邏輯會用到的方法，另外能避免非法資料進入資料庫，確保系統只處理有效的業務邏輯 (validators.go )，可預防前端人員在未來傳入非當時後端開出的規格的髒資料。
 │ └── order.go  // 創建訂單
 │ └── user.go  // 創建登入用帳號資訊，並對其進行加密
+│
 └── pkg/ // 可重用的公共庫（optional）
 ```
 
@@ -38,7 +40,7 @@ Use ".open FILENAME" to reopen on a persistent database.
 +-------------------+
 |      Router       |
 +-------------------+
-| + POST("/login", HandleLoginPost) |  => Router 綁定到 Handler 的方法
+| + POST("/login", HandleLoginPost) |  => Router 綁定到 Handler 的方法，這些Handler方法都放在cmd/xx.go裡定義的的方法
 +-------------------+
 +-------------------+
 |      Handler      | => cmd/handlers.go => 是一個中介層，負責處理路由進來的請求。它本身持有不同的 Model（例如 UserModel、OrderModel），並透過這些 Model 來執行資料存取或商業邏輯。
