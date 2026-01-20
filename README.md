@@ -189,7 +189,10 @@ func (h *Handler) AuthMiddleware() gin.HandlerFunc {
 
 // cmd/routes.go
 func setupRoutes(router *gin.Engine, h *Handler) {
+    <!-- 不用登入就可以方問 -->
+    router.GET("/", h.ServeNewOrderForm)
 
+    <!-- 需要登入才可以方問 -->
     admin := router.Group("/admin")
     admin.Use(h.AuthMiddleware()) // [步驟 A] 進入 /admin 路由前，會先跑 AuthMiddleware
     {
