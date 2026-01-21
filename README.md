@@ -71,7 +71,16 @@ Use ".open FILENAME" to reopen on a persistent database.
 +-------------------+
 
 ```
+## 專案選用套件說明:
 
+### gin-contrib
+> 使用原因: Gin框架是支持中間件的，在不同的場景下，中間件有不同的含義，而在Gin框架中，中間件可以看作是請求攔截器，主要用在請求處理函數被調用前後執行一些業務邏輯，比如用戶權限驗證，數據編碼轉換，記錄操作日誌，接口運行時間統計等。
+> 關鍵字: middleware gin session recomand --> https://zhuanlan.zhihu.com/p/30184285330
+```
+https://github.com/gin-contrib/sessions
+https://github.com/gin-contrib/sse
+
+```
 
 ### 常見符號
 ```
