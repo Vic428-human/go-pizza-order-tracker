@@ -183,15 +183,10 @@ func main() {
 & 表示取址，支持就地修改，如設置日誌或連接池
 ```
 
-### 常見符號
-```
-& 表示取址，支持就地修改，如設置日誌或連接池
-```
-
 ### 知識點
 
 #### ShouldBindJSON
-> 是現代前端/API 在送結構化 JSON 資料，開發者想明確指定「只收 JSON
+> 是現代前端/API 在送結構化 JSON 資料，開發者想明確指定只收 JSON
 
 ```
 type LoginRequest struct {
@@ -218,6 +213,7 @@ if err := c.ShouldBind(&req); err != nil {
 }
 ```
 
+### 常用sql語法
 ```
 <!-- 確定module都有載到在 go.sum -->
 go mod tidy
