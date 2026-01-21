@@ -79,8 +79,8 @@ Use ".open FILENAME" to reopen on a persistent database.
 ```
 <!-- 關鍵字: middleware gin session recomand --> https://zhuanlan.zhihu.com/p/30184285330 -->
 https://github.com/gin-contrib/sessions
+<!-- 進度條是要實時更新的，客戶端不需要主動發送請求 -->
 https://github.com/gin-contrib/sse
-
 ```
 
 ### 常見符號
