@@ -57,9 +57,9 @@ func (u *UserModel) GetUserByID(id string) (*User, error) {
 	var user User
 	if err := u.DB.First(&user, "id = ?", id).Error; err != nil { // SELECT * FROM users WHERE id = "1b74413f-f3b8-409f-ac47-e8c062e3472a";
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil // 找不到就回傳 nil，不算錯誤
+			return nil, nil // 資料庫裡已經沒有這個使用者
 		}
-		return nil, err
+		return nil, err // 資料庫錯誤
 	}
 	return &user, nil
 }

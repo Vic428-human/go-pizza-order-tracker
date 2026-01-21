@@ -6,6 +6,7 @@ import (
 	"html/template" // 這邊不要用成 text/template，會導致 Gin 無法正確渲染模板 (SetHTMLTemplate)
 	"os"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -64,6 +65,11 @@ func loadTemplates(router *gin.Engine) error {
 // 設置 session
 
 // 獲取 session
-func GetSessionString() string {
-	return ""
+func GetSession(c *gin.Context, key string) string {
+	session := sessions.Default(c)
+	str, ok := session.Get(key).(string)
+	if !ok {
+		return ""
+	}
+	return str
 }
