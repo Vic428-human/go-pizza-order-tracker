@@ -62,7 +62,29 @@ func loadTemplates(router *gin.Engine) error {
 	return nil
 }
 
-// 設置 session
+// 設置 session => 工具函式風格 :要回傳 error → 不要在裡面 c.String，交給呼叫者處理。工具函式可以在不同情境下重複使用，不會綁死在某種回應方式上
+
+/*
+	// 设置 session 路由
+	r.GET("/set-session", SetSession)
+
+// 要自己處理 HTTP → 不要回傳 error，直接在函式裡面回應，適合路由直接呼叫的時候的寫法
+
+	func SetSession(c *gin.Context) {
+	    session := sessions.Default(c)
+	    session.Set("user", "Fossen")
+	    if err := session.Save(); err != nil {
+	        c.String(http.StatusInternalServerError, fmt.Sprintf("Error saving session: %s", err.Error()))
+	        return
+	    }
+	    c.String(http.StatusOK, "Session set")
+	}
+*/
+func SetSession(c *gin.Context, key string, value string) error {
+	session := sessions.Default(c)
+	session.Set(key, value)
+	return session.Save()
+}
 
 // 獲取 session
 func GetSession(c *gin.Context, key string) string {
