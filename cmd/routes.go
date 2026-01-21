@@ -10,11 +10,15 @@ func setupRoutes(router *gin.Engine, h *Handler) {
 	router.GET("/", h.ServeNewOrderForm)            // 查看訂單
 	router.POST("/new-order", h.HandleNewOrderPost) // 創建新的訂單
 	router.GET("/customer/:id", h.serveCustomer)    // 查看顧客訂單內容
-	// 基本实现：使用 router.Static 方法来设置静态文件目录，例如 router.Static("/static", "./public")，这将把 public 目录下的所有文件映射到 /static 路径。
-	router.Static("/static", "./templates/static")
+
+	// 處理登入邏輯 => session不存在時，導轉去login頁面，此時要把錯誤訊息顯示再登入頁面
+	router.GET("/login", h.HandleLoginGet)
 
 	// 有登入後才能訪問
 	admin := router.Group("/admin")
 	admin.Use(h.AuthMiddleware())
+
+	// 把 templates/static 目錄下的所有文件映射到 /static 路徑。
+	router.Static("/static", "./templates/static")
 
 }
