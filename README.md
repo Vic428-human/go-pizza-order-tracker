@@ -83,12 +83,140 @@ https://github.com/gin-contrib/sessions
 https://github.com/gin-contrib/sse
 ```
 
+
+### Gin Middleware (gin.HandlerFunc 範例)
+> 透過session是否存在，來決定Redirect的路徑，對於網頁來說，會有區分登入後才能觀看的，跟沒有登入時也能觀看的頁面，下方的架構主要就是在實踐這一塊。
+
+- **全域 Middleware (LoggerMiddleware)**
+  - 請求進來時先記錄 `Request Path`
+
+- **路由群組 Middleware (AuthMiddleware)**
+  - 如果是 `/admin` 路由，會先檢查使用者是否登入
+  - **沒登入** → Redirect `/login` 並中斷
+  - **登入成功** → 繼續執行下一個 Handler
+
+- **Handler**
+  - `ServeAdminDashboard`：顯示後台首頁
+  - `HandleOrderPut`：更新訂單資訊
+
+- **全域 Middleware (LoggerMiddleware After)**
+  - Handler 執行完畢後，再記錄 `Response Status`
+
+```
+// cmd/middleware.go
+func (h *Handler) AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // [步驟 1] 進入 /admin 路由群組時，先執行 AuthMiddleware
+
+        userID := GetSessionString(c, "userID")
+
+        <!-- 沒登入 → Redirect /login 並中斷。 -->
+        if userID == "" {
+            // [步驟 2] 如果沒有 userID，導向 /login 並中斷後續流程
+            c.Redirect(http.StatusSeeOther, "/login")
+            c.Abort()
+            return
+        }
+
+        _, err := h.users.GetUserByID(userID)
+        if err != nil {
+            // [步驟 3] 如果 userID 無效，清除 session，導向 /login 並中斷
+            ClearSession(c)
+            c.Redirect(http.StatusSeeOther, "/login")
+            c.Abort()
+            return
+        }
+        <!-- 登入成功 → 繼續。 -->
+        // [步驟 4] 驗證成功，繼續執行下一個 Handler
+        c.Next()
+    }
+}
+
+// cmd/routes.go
+func setupRoutes(router *gin.Engine, h *Handler) {
+    <!-- 不用登入就可以方問 -->
+    router.GET("/", h.ServeNewOrderForm)
+
+    <!-- 需要登入才可以方問 -->
+    admin := router.Group("/admin")
+    admin.Use(h.AuthMiddleware()) // [步驟 A] 進入 /admin 路由前，會先跑 AuthMiddleware
+    {
+        // [步驟 B] 如果通過驗證(登入成功後)，才會執行以下 Handler
+        admin.GET("", h.ServeAdminDashboard)       // 顯示後台首頁
+        admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
+    }
+}
+
+
+// cmd/main.go 
+func LoggerMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // [步驟 0-前] 全域 Middleware：請求進來時先印出 Request path
+        println("Request path:", c.Request.URL.Path)
+
+        c.Next() // [步驟 0-中] 繼續執行後續 Middleware / Handler
+
+        // [步驟 0-後] Handler 執行完畢後，再印出 Response status
+        println("Response status:", c.Writer.Status())
+    }
+}
+
+
+// cmd/main.go
+func main() {
+    r := gin.Default()
+
+    // [第一層] 全域 Middleware：LoggerMiddleware
+    r.Use(LoggerMiddleware()) 
+
+    h := NewHandler(dbModel)
+    // [第二層] 設定路由，/admin 路由會套用 AuthMiddleware
+    setupRoutes(r,h) 
+
+    // [最後] 啟動伺服器，開始監聽請求
+    r.Run(":8080")
+}
+```
+
 ### 常見符號
 ```
 & 表示取址，支持就地修改，如設置日誌或連接池
 ```
 
-### 常用指令
+### 常見符號
+```
+& 表示取址，支持就地修改，如設置日誌或連接池
+```
+
+### 知識點
+
+#### ShouldBindJSON
+> 是現代前端/API 在送結構化 JSON 資料，開發者想明確指定「只收 JSON
+
+```
+type LoginRequest struct {
+    Username string `json:"username" binding:"required"`
+    Password string `json:"password" binding:"required"`
+}
+
+func ApiLogin(c *gin.Context) {
+    var req LoginRequest
+    if err := c.ShouldBindJSON(&req); err != nil { 
+        c.JSON(422, gin.H{"error": "格式錯誤或欄位缺失", "details": err.Error()})
+        return
+    }
+    // 登入邏輯...
+}
+```
+
+#### ShouldBind
+> 傳統網頁表單在送資料（form 格式），Gin 需要自動判斷格式
+```
+if err := c.ShouldBind(&req); err != nil {
+    c.JSON(422, gin.H{"error": "格式錯誤或欄位缺失", "details": err.Error()})
+    return
+}
+```
 
 ```
 <!-- 確定module都有載到在 go.sum -->
@@ -190,98 +318,6 @@ type OrderReuqest struct {
 
 ```
 
-#### Gin Middleware (gin.HandlerFunc 範例)
-> 透過session是否存在，來決定Redirect的路徑，對於網頁來說，會有區分登入後才能觀看的，跟沒有登入時也能觀看的頁面，下方的架構主要就是在實踐這一塊。
 
-- **全域 Middleware (LoggerMiddleware)**
-  - 請求進來時先記錄 `Request Path`
-
-- **路由群組 Middleware (AuthMiddleware)**
-  - 如果是 `/admin` 路由，會先檢查使用者是否登入
-  - **沒登入** → Redirect `/login` 並中斷
-  - **登入成功** → 繼續執行下一個 Handler
-
-- **Handler**
-  - `ServeAdminDashboard`：顯示後台首頁
-  - `HandleOrderPut`：更新訂單資訊
-
-- **全域 Middleware (LoggerMiddleware After)**
-  - Handler 執行完畢後，再記錄 `Response Status`
-
-```
-// cmd/middleware.go
-func (h *Handler) AuthMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        // [步驟 1] 進入 /admin 路由群組時，先執行 AuthMiddleware
-
-        userID := GetSessionString(c, "userID")
-
-        <!-- 沒登入 → Redirect /login 並中斷。 -->
-        if userID == "" {
-            // [步驟 2] 如果沒有 userID，導向 /login 並中斷後續流程
-            c.Redirect(http.StatusSeeOther, "/login")
-            c.Abort()
-            return
-        }
-
-        _, err := h.users.GetUserByID(userID)
-        if err != nil {
-            // [步驟 3] 如果 userID 無效，清除 session，導向 /login 並中斷
-            ClearSession(c)
-            c.Redirect(http.StatusSeeOther, "/login")
-            c.Abort()
-            return
-        }
-        <!-- 登入成功 → 繼續。 -->
-        // [步驟 4] 驗證成功，繼續執行下一個 Handler
-        c.Next()
-    }
-}
-
-// cmd/routes.go
-func setupRoutes(router *gin.Engine, h *Handler) {
-    <!-- 不用登入就可以方問 -->
-    router.GET("/", h.ServeNewOrderForm)
-
-    <!-- 需要登入才可以方問 -->
-    admin := router.Group("/admin")
-    admin.Use(h.AuthMiddleware()) // [步驟 A] 進入 /admin 路由前，會先跑 AuthMiddleware
-    {
-        // [步驟 B] 如果通過驗證(登入成功後)，才會執行以下 Handler
-        admin.GET("", h.ServeAdminDashboard)       // 顯示後台首頁
-        admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
-    }
-}
-
-
-// cmd/main.go 
-func LoggerMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        // [步驟 0-前] 全域 Middleware：請求進來時先印出 Request path
-        println("Request path:", c.Request.URL.Path)
-
-        c.Next() // [步驟 0-中] 繼續執行後續 Middleware / Handler
-
-        // [步驟 0-後] Handler 執行完畢後，再印出 Response status
-        println("Response status:", c.Writer.Status())
-    }
-}
-
-
-// cmd/main.go
-func main() {
-    r := gin.Default()
-
-    // [第一層] 全域 Middleware：LoggerMiddleware
-    r.Use(LoggerMiddleware()) 
-
-    h := NewHandler(dbModel)
-    // [第二層] 設定路由，/admin 路由會套用 AuthMiddleware
-    setupRoutes(r,h) 
-
-    // [最後] 啟動伺服器，開始監聽請求
-    r.Run(":8080")
-}
-```
 
 
