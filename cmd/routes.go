@@ -11,8 +11,9 @@ func setupRoutes(router *gin.Engine, h *Handler) {
 	router.POST("/new-order", h.HandleNewOrderPost) // 創建新的訂單
 	router.GET("/customer/:id", h.serveCustomer)    // 查看顧客訂單內容
 
-	// 處理登入邏輯 => session不存在時，導轉去login頁面，此時要把錯誤訊息顯示再登入頁面
+	// 不用登入就可以訪問
 	router.GET("/login", h.HandleLoginGet)
+	router.POST("/login", h.HandleLoginPost)
 
 	// 有登入後才能訪問
 	admin := router.Group("/admin")
