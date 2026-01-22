@@ -80,7 +80,7 @@ func loadTemplates(router *gin.Engine) error {
 	    c.String(http.StatusOK, "Session set")
 	}
 */
-func SetSession(c *gin.Context, key string, value string) error {
+func SetSession(c *gin.Context, key string, value interface{}) error {
 	session := sessions.Default(c)
 	session.Set(key, value)
 	return session.Save()

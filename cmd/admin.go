@@ -37,6 +37,9 @@ func (h *Handler) HandleLoginPost(c *gin.Context) {
 		return
 	}
 
+	SetSession(c, "userID", user.ID)
+	SetSession(c, "username", user.Username)
+
 	// 登入成功，存session跟導轉路徑
 	// SetSession(c, "userID", user.ID)
 	c.Redirect(http.StatusSeeOther, "/admin")
