@@ -1,12 +1,20 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-contrib/sessions"
+	gormsessions "github.com/gin-contrib/sessions/gorm"
+	"github.com/gin-gonic/gin"
+)
 
 /*
 第二個參數放的是 處理該路由的 handler function，發送請求時要執行的邏輯。
 r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
 */
-func setupRoutes(router *gin.Engine, h *Handler) {
+func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
+
+	// 是瀏覽器 cookie 的名稱（例如 Set-Cookie: pizza-tracker=...
+	// store：指定 session 資料儲存在哪裡（這裡是 SQLite）
+	router.Use(sessions.Sessions("pizza-tracker", store))
 
 	// 不用登入就可以訪問的endpoint
 	router.GET("/", h.ServeNewOrderForm)            // 查看訂單

@@ -24,6 +24,9 @@ func NewHandler(dbModel *models.DBModel) *Handler {
 	// DBModel 結構體裡面有一個欄位 Order，型別應該是 models.OrderModel。
 	// dbModel.Order 代表的是 取出 DBModel 裡的 Order 欄位。
 	// & 是「取址運算子」，意思是「取得某個變數的記憶體位址」。
-	return &Handler{orders: &dbModel.Order} // &dbModel.Order 則是 指向這個值的指標 (OrderModel)*。
+	return &Handler{
+		orders: &dbModel.Order,
+		users:  &dbModel.User,
+	} // &dbModel.Order 則是 指向這個值的指標 (OrderModel)*。
 	// 這樣 Handler 就能透過 orders 操作 OrderModel 的方法。
 }
