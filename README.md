@@ -22,6 +22,9 @@ yourproject/
 └── pkg/ // 可重用的公共庫（optional）
 ```
 
+### 筆記區 
+- [此專案筆記位置](https://www.notion.so/go-1c6a54651e3e80808c81ce1843e7931e)
+
 ### 啟用專案:
 ```
 輸入 sqlite3 確認是否出現下方訊息，有的話代表有安裝sqlite cli
