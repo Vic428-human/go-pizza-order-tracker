@@ -28,6 +28,10 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	// 有登入後才能訪問
 	admin := router.Group("/admin")
 	admin.Use(h.AuthMiddleware())
+	{
+		// admin.GET("", h.ServeAdminDashboard)       // 顯示後台首頁
+		// admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
+	}
 
 	// 把 templates/static 目錄下的所有文件映射到 /static 路徑。
 	router.Static("/static", "./templates/static")
