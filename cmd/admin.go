@@ -48,7 +48,7 @@ func (h *Handler) HandleLoginPost(c *gin.Context) {
 func (h *Handler) HandleLogoutPost(c *gin.Context) {
 
 	if err := ClearAllSession(c); err != nil {
-		c.String(http.StatusInternalServerError, "Error deleting session")
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/login")
