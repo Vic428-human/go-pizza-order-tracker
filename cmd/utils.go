@@ -95,3 +95,11 @@ func GetSession(c *gin.Context, key string) string {
 	}
 	return str
 }
+
+func ClearAllSession(c *gin.Context) error {
+	session := sessions.Default(c)
+	// session.Delete("user") => 只刪除 session 中 特定 key（這裡是 "user"）的值。
+	// session.Clear() =>  清空整個 session 的所有 key-value，讓 session 變成空的 map。
+	session.Clear()
+	return session.Save()
+}

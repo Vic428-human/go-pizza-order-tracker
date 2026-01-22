@@ -7,13 +7,15 @@ import "github.com/gin-gonic/gin"
 r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
 */
 func setupRoutes(router *gin.Engine, h *Handler) {
+
+	// 不用登入就可以訪問的endpoint
 	router.GET("/", h.ServeNewOrderForm)            // 查看訂單
 	router.POST("/new-order", h.HandleNewOrderPost) // 創建新的訂單
 	router.GET("/customer/:id", h.serveCustomer)    // 查看顧客訂單內容
 
-	// 不用登入就可以訪問
 	router.GET("/login", h.HandleLoginGet)
 	router.POST("/login", h.HandleLoginPost)
+	router.POST("/logout", h.HandleLogoutPost)
 
 	// 有登入後才能訪問
 	admin := router.Group("/admin")
