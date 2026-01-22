@@ -1,5 +1,11 @@
 package main
 
+/** 用途:
+1. 載入環境變數config
+2. 載入模板
+3. 建立基於 GORM 的 session store。
+4. 對 session 的操作
+**/
 import (
 	"encoding/json"
 	"fmt"
@@ -7,7 +13,9 @@ import (
 	"os"
 
 	"github.com/gin-contrib/sessions"
+	gormsessions "github.com/gin-contrib/sessions/gorm"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Config struct {
@@ -15,6 +23,7 @@ type Config struct {
 	DBPath string
 }
 
+// 1. 載入環境變數config
 func loadConfig() Config {
 	return Config{
 		Port:   getEnv("PORT", "8080"), // 定義key 跟 value
@@ -34,6 +43,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
+// 2. 載入模板
 func loadTemplates(router *gin.Engine) error {
 	functions := template.FuncMap{
 		"add": func(a, b int) int { return a + b },
@@ -62,24 +72,41 @@ func loadTemplates(router *gin.Engine) error {
 	return nil
 }
 
-// 設置 session => 工具函式風格 :要回傳 error → 不要在裡面 c.String，交給呼叫者處理。工具函式可以在不同情境下重複使用，不會綁死在某種回應方式上
+// 3. 建立基於 GORM 的 session store。
+func createSessionStore(db *gorm.DB, secret []byte) gormsessions.Store {
+	store := gormsessions.NewStore(db, true, secret)
+
+	// 用 Options() 方法設定 session 選項
+	store.Options(sessions.Options{
+		Path:     "/",   // Cookie 的作用路徑，"/" 表示整個網站都會帶上這個 Cookie
+		MaxAge:   86400, // Cookie 的存活時間（秒），這裡是 86400 秒 = 1 天
+		Secure:   true,  // 是否只在 HTTPS 連線中傳送 Cookie，true 表示僅限安全連線
+		HttpOnly: true,  // 是否禁止 JavaScript 存取 Cookie，true 可防止 XSS 攻擊
+		SameSite: 3,     // SameSite 屬性，用來限制跨站請求攜帶 Cookie
+		// 0 = Default, 1 = Lax, 2 = Strict, 3 = None
+		// 這裡設為 3，表示允許跨站請求攜帶 Cookie（需搭配 Secure）
+	})
+
+	return store
+}
 
 /*
-	// 设置 session 路由
-	r.GET("/set-session", SetSession)
+情況1.设置 session 路由，要自己處理 HTTP → 不要回傳 error，直接在函式裡面回應，適合路由直接呼叫的時候的寫法
 
-// 要自己處理 HTTP → 不要回傳 error，直接在函式裡面回應，適合路由直接呼叫的時候的寫法
+router.GET("/set-session", SetSession)
 
 	func SetSession(c *gin.Context) {
-	    session := sessions.Default(c)
-	    session.Set("user", "Fossen")
-	    if err := session.Save(); err != nil {
-	        c.String(http.StatusInternalServerError, fmt.Sprintf("Error saving session: %s", err.Error()))
-	        return
-	    }
-	    c.String(http.StatusOK, "Session set")
+		session := sessions.Default(c)
+		session.Set("user", "Fossen")
+		if err := session.Save(); err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("Error saving session: %s", err.Error()))
+			return
+		}
+		c.String(http.StatusOK, "Session set")
 	}
 */
+
+// 情況2.工具函式風格:要回傳 error → 不要在裡面 c.String，交給呼叫者處理。工具函式可以在不同情境下重複使用，不會綁死在某種回應方式上
 func SetSession(c *gin.Context, key string, value interface{}) error {
 	session := sessions.Default(c)
 	session.Set(key, value)
