@@ -24,6 +24,7 @@ yourproject/
 
 ### 筆記區 
 - [此專案筆記位置](https://www.notion.so/go-1c6a54651e3e80808c81ce1843e7931e)
+- [Gradient Generator](https://gradienty.codes/)
 
 ### 啟用專案:
 ```
@@ -294,7 +295,16 @@ type OrderReuqest struct {
 {{end}}
 ```
 
-### 其他實用技巧
+#### tailwind相關
+```
+w-full => 填满其直接父元素的宽度
+<!-- 指的是 min-h-screen 這裡的塊級元素 -->
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full"></div>
+</div>
+
+max-w-md => max-width: 28rem; /* 448px */ 元素宽度不会超过 448px，但如果父容器比 448px 窄，元素会自动缩小以适应，通常需要配合 w-full 或其他宽度类使用，才能在小屏幕上伸缩。
+```
 
 #### 生成 svg 檔案
 
