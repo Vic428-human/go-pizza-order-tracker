@@ -1,0 +1,21 @@
+{{template "top" .}}
+<title>Login Admin</title>
+</head>
+<body class="bg-gradient-to-br from-orange-100 via-gray-600 to-red-100">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <!-- Form container 的寬度不會超過 448px，但在448px前會是填滿寬度的狀態，若超過448px則Form 置中 -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Pizza Tracker</h1>
+                <p class="text-gray-600">Admin Login</p>
+            </div>
+            {{if .Error}}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {{.Error}}
+            </div>
+            {{end}}
+            <!-- Form 登入時需要輸入的Input -->
+        </div>
+
+    </div>
+</body>
