@@ -19,27 +19,28 @@ import (
 )
 
 type Config struct {
-	Port   string
-	DBPath string
+	Port             string
+	DBPath           string
+	SessionSecretKey string
 }
 
 // 1. 載入環境變數config
 func loadConfig() Config {
 	return Config{
-		Port:   getEnv("PORT", "8080"), // 定義key 跟 value
-		DBPath: getEnv("DATABASE_URL", "./data/orders.db"),
+		Port:             getEnv("PORT", "8080"), // 定義key 跟 value
+		DBPath:           getEnv("DATABASE_URL", "./data/orders.db"),
+		SessionSecretKey: getEnv("SESSION_SECRET_KEY", "pizza-order-secret-key"),
 	}
 }
 
-// Example: Setting an environment variable in code
-// err := os.Setenv("NEW_VAR", "GoLang Rocks!")
-// Retrieve the newly set variable
-// fmt.Println("NEW_VAR =", os.Getenv("NEW_VAR")) => NEW_VAR = GoLang Rocks!
+// env存在用env，不存在用預設的 loadConfig
 func getEnv(key, defaultValue string) string {
+	// 環境變數存在時，用環境變數設定的值
 	value := os.Getenv(key)
 	if value != "" {
 		return value
 	}
+	// 環境變不存在時
 	return defaultValue
 }
 
@@ -72,7 +73,13 @@ func loadTemplates(router *gin.Engine) error {
 	return nil
 }
 
-// 3. 建立基於 GORM 的 session store。
+/*
+ 3. 建立基於 GORM 的 session store。
+    db => 上面建立的 GORM 資料庫連線。
+    true => 表示自動建立 session 資料表（如果不存在的話）。GORM 會自動 migrate 出 sessions 表
+    secret => 用來簽署 session cookie 的密鑰（secret key），確保 session ID 不被篡改
+    ⚠️ 實際部署時應使用更安全、隨機且保密的金鑰，而非硬編碼 "secret"。
+*/
 func createSessionStore(db *gorm.DB, secret []byte) gormsessions.Store {
 	store := gormsessions.NewStore(db, true, secret)
 
@@ -113,7 +120,6 @@ func SetSession(c *gin.Context, key string, value interface{}) error {
 	return session.Save()
 }
 
-// 獲取 session
 func GetSession(c *gin.Context, key string) string {
 	session := sessions.Default(c)
 	str, ok := session.Get(key).(string)

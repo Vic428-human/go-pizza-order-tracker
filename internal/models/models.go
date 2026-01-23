@@ -42,8 +42,9 @@ type DBModel struct {
 // DBModel 通常是一個封裝了多個資料模型的結構體，例如 OrderModel、UserModel 等，負責與資料庫互動。
 func InitDB(dataSourceName string) (*DBModel, error) {
 
-	// 第一個參數 Dialector，用來指定數據庫的類型，像是 mysql / sqlite / postgres 等，db 是由 gorm.Open 回傳的 *gorm.DB 物件， https://zhuanlan.zhihu.com/p/651250516
-	db, err := gorm.Open(sqlite.Open(dataSourceName), &gorm.Config{}) // & 表示取址，支持就地修改，如設置日誌或連接池
+	// https://zhuanlan.zhihu.com/p/651250516
+	// 參數1 Dialector，指定數據庫類型，像 mysql / sqlite / postgres 等，db 是由 gorm.Open 回傳的 *gorm.DB 物件。
+	db, err := gorm.Open(sqlite.Open(dataSourceName), &gorm.Config{})
 
 	if err != nil {
 		return nil, fmt.Errorf("建立資料庫連線(資料庫不存在、連線字串錯誤、驅動問題): %v", err)

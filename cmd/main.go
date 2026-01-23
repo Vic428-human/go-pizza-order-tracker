@@ -59,12 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sessionStore := createSessionStore(dbModel.DB, []byte("secret"))
-	// db => 上面建立的 GORM 資料庫連線。
-	// true => 表示自動建立 session 資料表（如果不存在的話）。GORM 會自動 migrate 出 sessions 表
-	// secret => 用來簽署 session cookie 的密鑰（secret key），確保 session ID 不被篡改
-	// ⚠️ 實際部署時應使用更安全、隨機且保密的金鑰，而非硬編碼 "secret"。
-
+	sessionStore := createSessionStore(dbModel.DB, []byte(cfg.SessionSecretKey))
 	setupRoutes(router, h, sessionStore)
 	// slog.Info("hello, world", "user", os.Getenv("USER"))
 	// 2023/08/04 16:27:19 INFO hello, world user=jba
