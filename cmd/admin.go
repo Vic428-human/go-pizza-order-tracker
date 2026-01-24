@@ -2,9 +2,16 @@ package main
 
 import (
 	"net/http"
+	"pizza-tracker-go/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+type AdminData struct {
+	Orders   []models.Order
+	Status   []string
+	Username string
+}
 
 // 處理登入邏輯 => session不存在時，導轉去login頁面，此時要把錯誤訊息顯示再登入頁面
 type LoginData struct {
@@ -52,4 +59,13 @@ func (h *Handler) HandleLogoutPost(c *gin.Context) {
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/login")
+}
+
+// 需要顯示所有訂單、先前存在session的username、所有訂單狀態
+// orders => 所有訂單，每個訂單的實際進度條狀態，也就是當前狀態處在哪個階段
+// Status => 需要把所有狀態傳進去是因為要做下拉選單，所以要知道總共有哪些狀態可以供選擇
+func (h *Handler) ServeAdminDashboard(c *gin.Context) {
+	orders, _ := h.orders.GetAllOrders()
+	username := GetSession(c, "username")
+	c.HTML(http.StatusOK, "admin.tmpl", AdminData{Orders: orders, Status: models.OrderStatues, Username: username})
 }
