@@ -19,7 +19,7 @@ func (h *Handler) HandleLoginGet(c *gin.Context) {
 func (h *Handler) HandleLoginPost(c *gin.Context) {
 	type LoginRequest struct {
 		Username string `json:"username" binding:"required,min=3,max=50"`
-		Password string `json:"password" binding:"required,min=6"` // 至少6個字元，實際可再加強
+		Password string `json:"password" binding:"required,min=6"`
 	}
 
 	var req LoginRequest
