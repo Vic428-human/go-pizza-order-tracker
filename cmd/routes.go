@@ -21,15 +21,16 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	router.POST("/new-order", h.HandleNewOrderPost) // 創建新的訂單
 	router.GET("/customer/:id", h.serveCustomer)    // 查看顧客訂單內容
 
+	// 登入前在登入畫面
 	router.GET("/login", h.HandleLoginGet)
 	router.POST("/login", h.HandleLoginPost)
 	router.POST("/logout", h.HandleLogoutPost)
 
-	// 有登入後才能訪問
+	// 登入後，接單人員到後台可以操作訂單的狀態
 	admin := router.Group("/admin")
 	admin.Use(h.AuthMiddleware())
 	{
-		// admin.GET("", h.ServeAdminDashboard)       // 顯示後台首頁
+		admin.GET("", h.ServeAdminDashboard) // 顯示後台首頁
 		// admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
 	}
 

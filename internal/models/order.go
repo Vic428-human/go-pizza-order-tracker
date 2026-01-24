@@ -109,7 +109,12 @@ func (o *OrderModel) GetOrder(id string) (*Order, error) {
 	var order Order
 	// 每一筆 OrderItem 的顧客訂單，都可以透過 id 去查詢
 	// 所以如果前端提供了id給後端查詢，但id不存在，就會回傳錯誤
-	//
 	err := o.DB.Preload("Items").First(&order, "id = ?", id).Error
 	return &order, err
+}
+
+func (o *OrderModel) GetAllOrders() ([]Order, error) {
+	var orders []Order
+	err := o.DB.Preload("Items").Find(&orders).Error
+	return orders, err
 }
