@@ -24,19 +24,19 @@ func (h *Handler) HandleLoginGet(c *gin.Context) {
 }
 
 func (h *Handler) HandleLoginPost(c *gin.Context) {
-	type LoginRequest struct {
-		Username string `json:"username" binding:"required,min=3,max=50"`
-		Password string `json:"password" binding:"required,min=6"`
+	var form struct {
+		Username string `form:"username" binding:"required,min=3,max=50"`
+		Password string `form:"password" binding:"required,min=6"`
 	}
 
-	var req LoginRequest
-	if err := c.ShouldBind(&req); err != nil {
+	// 先判斷規則方面的錯誤
+	if err := c.ShouldBind(&form); err != nil {
 		c.HTML(http.StatusOK, "login.tmpl", LoginData{Error: "Invalid input: " + err.Error()})
 		return
 	}
 
-	user, err := h.users.AuthenticateUser(req.Username, req.Password)
-	// 登入失敗
+	user, err := h.users.AuthenticateUser(form.Username, form.Password)
+	//規則正確，但登入資訊錯誤
 	if err != nil {
 		c.HTML(http.StatusOK, "login.tmpl", LoginData{
 			Error: "Invalid credentials",
