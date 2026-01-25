@@ -36,10 +36,11 @@ func (h *Handler) HandleLoginPost(c *gin.Context) {
 	}
 
 	user, err := h.users.AuthenticateUser(form.Username, form.Password)
+
 	//規則正確，但登入資訊錯誤
 	if err != nil {
 		c.HTML(http.StatusOK, "login.tmpl", LoginData{
-			Error: "Invalid credentials",
+			Error: err.Error(), // 使用實際的錯誤訊息
 		})
 		return
 	}
