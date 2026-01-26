@@ -1,4 +1,5 @@
-### 檔案架構:
+### 檔案架構
+> 本專案前期使用 go template 來呈現前端的UI效果，後期會另外添加React UI模板。這部分有時間才會陸續迭代，但主軸還是圍繞著go template 跟 gin gorm等候端API規畫的製作上，所以如果只是想看DEMO，以go template主就好
 
 ```code
 yourproject/
@@ -19,15 +20,24 @@ yourproject/
 │ └── order.go  // 創建訂單
 │ └── user.go  // 創建登入用帳號資訊，並對其進行加密
 │
-└── pkg/ // 可重用的公共庫（optional）
+└── frontend/
+│ └── pages/
+│ │ └── AdminDashboard.jsx // 獲取cmd\routes.go裡的 TMPL 版本 的 API 後端資料回傳
+│
+│
 ```
 
 ### 筆記區 
 - [此專案筆記位置](https://www.notion.so/go-1c6a54651e3e80808c81ce1843e7931e)
 - [Gradient Generator](https://gradienty.codes/)
 
-### 啟用專案:
+### 後端啟用專案
 ```
+<!-- REACT情況 -->
+go run ./cmd // http://localhost:8080/api/admin/dashboard 可以看到後端將什麼資料傳給前端
+<!-- GO TEMPLATE情況 -->
+go run ./cmd // http://localhost:8080/admin // 直接透過go template實踐訂單登入系統邏輯
+
 輸入 sqlite3 確認是否出現下方訊息，有的話代表有安裝sqlite cli
 <!-- https://sqlite.org/download.html -->
 <!-- 本專案使用的是 sqlite-tools-osx-x64-351020zip 沒有  ARM的那個版本  -->
@@ -36,6 +46,11 @@ SQLite version 3.51.2 2026-01-09 17:27:48
 Enter ".help" for usage hints.
 Connected to a transient in-memory database.
 Use ".open FILENAME" to reopen on a persistent database.
+```
+
+### 前端啟用專案
+```
+npm run dev // http://localhost:5173/admin // 可以看到來自 /api/admin/dashboard 後端傳遞的資料
 ```
 
 ### 登入整體流程圖: /login Router → Handler → Model → DB
@@ -75,7 +90,7 @@ Use ".open FILENAME" to reopen on a persistent database.
 +-------------------+
 
 ```
-## 專案選用套件說明:
+## 專案選用套件說明
 
 ### gin-contrib
 > 使用原因: Gin框架是支持中間件的，在不同的場景下，中間件有不同的含義，而在Gin框架中，中間件可以看作是請求攔截器，主要用在請求處理函數被調用前後執行一些業務邏輯，比如用戶權限驗證，數據編碼轉換，記錄操作日誌，接口運行時間統計等。加上實作上我們是透過 middleware來帶一層對session判斷是否已經登入，進行路由導轉，所以選用 gin-contrib 是相對合適的。
