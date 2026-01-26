@@ -240,6 +240,9 @@ sqlite3 -header -column data/orders.db "SELECT * FROM users;"
 <!-- 覆寫特定欄位對應的Value (bash模式下才可以看到完整的密碼，由於太長的關係，powershell看不到完整的密碼) -->
 sqlite3 data/orders.db 'INSERT OR REPLACE INTO users (username, password) VALUES("admin", "$2a$11$KuR6igHoxf/yUKrl4IW0GO0ID6uRE3bWxQ5XMBno0N/cWNf8KtVi6");'
 
+sqlite3 data/orders.db "INSERT OR REPLACE INTO users (username, password) VALUES('admin', '\$2a\$11\$KuR6igHoxf/yUKrl4IW0GO0ID6uRE3bWxQ5XMBno0N/cWNf8KtVi6');"
+
+
 ```
 
 ### 錯誤訊息快速查找
