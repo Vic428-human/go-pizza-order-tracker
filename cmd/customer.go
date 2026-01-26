@@ -6,6 +6,7 @@ import (
 	"os"
 	"pizza-tracker-go/internal/models"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -124,5 +125,20 @@ func (h *Handler) serveCustomer(c *gin.Context) {
 		Order:    *order,
 		Statuses: models.OrderStatues, // {{range $index, $status := .Statuses}}
 		// .Statuses：代表傳入模板的資料結構中，名為 Statuses 的欄位（通常是一個 slice）
+	})
+}
+
+// http://localhost:8080/api/admin/dashboard
+// Handler.go => 這樣 /api/admin/dashboard 就會回傳 JSON，React 可以直接拿。
+func (h *Handler) GetAdminDashboardJSON(c *gin.Context) {
+	// 假設你有 session，可以拿到使用者名稱
+	session := sessions.Default(c)
+	username := session.Get("username")
+
+	// 這裡可以查 DB 或組合資料
+	c.JSON(200, gin.H{
+		"username": username,
+		"orders":   []string{"order1", "order2"},
+		"status":   "ok",
 	})
 }

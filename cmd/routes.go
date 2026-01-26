@@ -11,30 +11,37 @@ import (
 r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
 */
 func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
-
-	// 是瀏覽器 cookie 的名稱（例如 Set-Cookie: pizza-tracker=...
-	// store：指定 session 資料儲存在哪裡（這裡是 SQLite）
 	router.Use(sessions.Sessions("pizza-tracker", store))
 
-	// 不用登入就可以訪問的endpoint
-	router.GET("/", h.ServeNewOrderForm)            // 查看訂單
-	router.POST("/new-order", h.HandleNewOrderPost) // 創建新的訂單
-	router.GET("/customer/:id", h.serveCustomer)    // 查看顧客訂單內容
+	// ====== TMPL 版本 ======
+	router.GET("/", h.ServeNewOrderForm)
+	router.POST("/new-order", h.HandleNewOrderPost)
+	router.GET("/customer/:id", h.serveCustomer)
 
-	// 登入前在登入畫面
 	router.GET("/login", h.HandleLoginGet)
 	router.POST("/login", h.HandleLoginPost)
 	router.POST("/logout", h.HandleLogoutPost)
 
-	// 登入後，接單人員到後台可以操作訂單的狀態
 	admin := router.Group("/admin")
 	admin.Use(h.AuthMiddleware())
 	{
-		admin.GET("", h.ServeAdminDashboard) // 顯示後台首頁
-		// admin.POST("/order/:id/update", h.HandleOrderPut) // 更新訂單
+		admin.GET("", h.ServeAdminDashboard)
 	}
 
-	// 把 templates/static 目錄下的所有文件映射到 /static 路徑。
+	// ====== TMPL 版本 ====== 把數據直接交付給 templtate
 	router.Static("/static", "./templates/static")
+
+	// ====== React API 版本 ======
+	api := router.Group("/api")
+	{
+		adminApi := api.Group("/admin")
+		adminApi.Use(h.AuthMiddleware())
+		{
+			adminApi.GET("/dashboard", h.GetAdminDashboardJSON)
+		}
+	}
+
+	// ====== React 前端頁面 ======
+	router.Static("/react", "./frontend/dist")
 
 }
