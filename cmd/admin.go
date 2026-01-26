@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AdminData struct {
+type AdminOrderData struct {
 	Orders   []models.Order
 	Status   []string
 	Username string
@@ -64,21 +64,47 @@ func (h *Handler) HandleLogoutPost(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/login")
 }
 
-// 需要顯示所有訂單、先前存在session的username、所有訂單狀態
+// 顯示所有訂單、先前存在session的username、所有訂單狀態
 // orders => 所有訂單，每個訂單的實際進度條狀態，也就是當前狀態處在哪個階段
 // Status => 需要把所有狀態傳進去是因為要做下拉選單，所以要知道總共有哪些狀態可以供選擇
 func (h *Handler) ServeAdminDashboard(c *gin.Context) {
 	orders, err := h.orders.GetAllOrders()
 	if err != nil {
-		log.Printf("GetAllOrders error: %v", err)
+		log.Printf("獲取訂單資訊失敗!!!: %v", err)
+		c.String(http.StatusInternalServerError, "獲取訂單資訊失敗!!!")
 	}
 	username := GetSession(c, "username")
 
 	log.Printf("===>當前登入帳號: %s", username)
-
-	c.HTML(http.StatusOK, "admin.tmpl", AdminData{
+	c.HTML(http.StatusOK, "admin.tmpl", AdminOrderData{
 		Orders:   orders,
 		Status:   models.OrderStatues,
 		Username: username,
 	})
+}
+
+// 更新特定訂單
+func (h *Handler) handleOrderPut(c *gin.Context) {
+	orderID := c.Param("id")
+	newStatus := c.PostForm("status")
+
+	// 更新狀態失敗
+	if err := h.orders.UpdateOrderStatus(orderID, newStatus); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// 更新狀態成功
+	c.Redirect(http.StatusSeeOther, "/admin")
+
+}
+
+// 刪除特定訂單
+func (h *Handler) handleOrderDelete(c *gin.Context) {
+	orderID := c.Param("id")
+	if err := h.orders.DeleteOrder(orderID); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Redirect(http.StatusSeeOther, "/admin")
 }
