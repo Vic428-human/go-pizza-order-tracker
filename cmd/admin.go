@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"pizza-tracker-go/internal/models"
 
@@ -44,8 +46,8 @@ func (h *Handler) HandleLoginPost(c *gin.Context) {
 		})
 		return
 	}
-
-	SetSession(c, "userID", user.ID)
+	// 需要改成字串，因為等下操作 DB 的 GetUserByID 是拿 string去搜尋
+	SetSession(c, "userID", fmt.Sprintf("%v", user.ID))
 	SetSession(c, "username", user.Username)
 
 	// 登入成功，存session跟導轉路徑
@@ -66,7 +68,17 @@ func (h *Handler) HandleLogoutPost(c *gin.Context) {
 // orders => 所有訂單，每個訂單的實際進度條狀態，也就是當前狀態處在哪個階段
 // Status => 需要把所有狀態傳進去是因為要做下拉選單，所以要知道總共有哪些狀態可以供選擇
 func (h *Handler) ServeAdminDashboard(c *gin.Context) {
-	orders, _ := h.orders.GetAllOrders()
+	orders, err := h.orders.GetAllOrders()
+	if err != nil {
+		log.Printf("GetAllOrders error: %v", err)
+	}
 	username := GetSession(c, "username")
-	c.HTML(http.StatusOK, "admin.tmpl", AdminData{Orders: orders, Status: models.OrderStatues, Username: username})
+
+	log.Printf("===>當前登入帳號: %s", username)
+
+	c.HTML(http.StatusOK, "admin.tmpl", AdminData{
+		Orders:   orders,
+		Status:   models.OrderStatues,
+		Username: username,
+	})
 }
