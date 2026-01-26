@@ -71,6 +71,8 @@ type Order struct {
 	// 一對多關聯，在 OrderItem 裡有訂單ID (OrderID)，指向的是 Order 裡的 ID (Order.ID)
 	Items     []OrderItem `gorm:"foreignKey:OrderID" json:"items"`
 	CreatedAt time.Time   `json:"createdAt"`
+	// 更新狀態時間
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type OrderItem struct {
@@ -115,6 +117,30 @@ func (o *OrderModel) GetOrder(id string) (*Order, error) {
 
 func (o *OrderModel) GetAllOrders() ([]Order, error) {
 	var orders []Order
-	err := o.DB.Preload("Items").Find(&orders).Error
+	err := o.DB.
+		Preload("Items").
+		Order("created_at DESC"). // 依建立時間由新到舊，CreatedAt 是 GORM 內建追蹤時間欄位名稱
+		Find(&orders).Error
 	return orders, err
+}
+
+func (o *OrderModel) UpdateOrderStatus(orderID string, newStatus string) error {
+	err := o.DB.Model(&Order{}).
+		Where("id = ?", orderID).
+		// 一次需要更新多個欄位的時候
+		Updates(map[string]any{
+			"status": newStatus,
+			// "updatedAt": newUpdatedAt, 等status更新完成後才實驗更新updatedAt
+		}).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// delete order
+func (o *OrderModel) DeleteOrder(id string) error {
+	return o.DB.Where("id = ?", id).Delete(&Order{}).Error
 }
