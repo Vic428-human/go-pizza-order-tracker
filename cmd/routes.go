@@ -26,6 +26,10 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	admin.Use(h.AuthMiddleware())
 	{
 		admin.GET("", h.ServeAdminDashboard)
+		//透過 id 來更新訂單
+		admin.POST("/order/:id/update", h.handleOrderPut)
+		// 透過 id 來刪除訂單
+		admin.POST("/order/:id/delete", h.handleOrderDelete)
 	}
 
 	// ====== TMPL 版本 ====== 把數據直接交付給 templtate
