@@ -17,6 +17,9 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	router.GET("/", h.ServeNewOrderForm)
 	router.POST("/new-order", h.HandleNewOrderPost)
 	router.GET("/customer/:id", h.serveCustomer)
+	router.GET("/notifications", h.ServeNotification)
+
+	// ====== React 版本 ======
 
 	router.GET("/login", h.HandleLoginGet)
 	router.POST("/login", h.HandleLoginPost)
