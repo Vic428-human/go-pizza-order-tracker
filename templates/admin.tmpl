@@ -99,6 +99,18 @@
                                         {{end}}
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex gap-2">
+                                        <form action="/admin/orders/{{.ID}}/update" method="POST">
+                                            <select name="status" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all bg-white font-medium">
+                                                {{$currentStatus := .Status}}
+                                                {{range $.Statuses}}
+                                                <option {{if eq . $currentStatus}} selected {{end}} value="{{.}}">{{.}}</option>
+                                                {{end}} 
+                                            </select>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
                             {{end}}
                         </tbody>

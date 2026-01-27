@@ -11,7 +11,7 @@ import (
 
 type AdminOrderData struct {
 	Orders   []models.Order
-	Status   []string
+	Statuses []string
 	Username string
 }
 
@@ -78,7 +78,7 @@ func (h *Handler) ServeAdminDashboard(c *gin.Context) {
 	log.Printf("===>當前登入帳號: %s", username)
 	c.HTML(http.StatusOK, "admin.tmpl", AdminOrderData{
 		Orders:   orders,
-		Status:   models.OrderStatues,
+		Statuses: models.OrderStatues,
 		Username: username,
 	})
 }
