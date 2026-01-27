@@ -29,7 +29,7 @@
                     <h2 class="text-2xl font-bold text-gray-900 mr-2">Active orders</h2>
                     <button onclick="location.reload()"
                         class="text-gray-500 hover:text-gray-700 transition-colors ml-2 p-1.5 rounded-lg hover:bg-gray-100"><span
-                            class="text-xl">同步</span></button>
+                            class="text-xl">🔄</span></button>
                 </div>
                 <div class="w-full overflow-x-auto rounded-xl border border-gray-200">
                     <table class="w-full">
@@ -89,7 +89,13 @@
                                 <td class="px-6 py-4 text-sm text-gray-700">
                                     <div class="space-y-1">
                                         {{range $index, $pizza := .Items}}
-                                        <div></div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-400">#{{add $index 1}}</span>
+                                            <span class="truncate">{{$pizza.Size}} {{$pizza.Pizza}}</span>
+                                            {{if $pizza.Instructions}}
+                                            <span class="size-4 text-gray-400 cursor-help" title="{{$pizza.Instructions}}">ⓘ</span>
+                                            {{end}}
+                                        </div>
                                         {{end}}
                                     </div>
                                 </td>
