@@ -9,7 +9,7 @@ type Handler struct {
 	orders *models.OrderModel // Ex: orders 指向 OrderModel 指標，用來處理有關訂單的資料操作，像是建立/查詢
 	users  *models.UserModel
 	// 可以直接調用 cmd 目錄下的其他功能模組
-	Notification *Notification
+	Notification *NotificationManager
 }
 
 // 1. 單元測試時，可以注入假的 MockOrderModel，輕鬆模擬資料庫行為

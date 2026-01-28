@@ -1,7 +1,10 @@
 package main
 
-type Notification struct {
+import "sync"
+
+type NotificationManager struct {
 	clients map[string]map[chan string]bool
+	mu      sync.RWMutex
 }
 
 /*
@@ -26,8 +29,8 @@ type Notification struct {
 		},
 	}
 */
-func NewNotification() *Notification {
-	return &Notification{clients: make(map[string]map[chan string]bool)}
+func NewNotification() *NotificationManager {
+	return &NotificationManager{clients: make(map[string]map[chan string]bool)}
 }
 
 // 2.支援動態訂閱/取消
@@ -35,7 +38,7 @@ func NewNotification() *Notification {
 // 客戶端斷線時清理 => delete(n.clients["order-123"], 0xc0000a4000)
 
 // 1. 客戶端連線時註冊
-func (n *Notification) Subscribe(topic string, client chan string) {
+func (n *NotificationManager) Subscribe(topic string, client chan string) {
 	if n.clients[topic] == nil {
 		n.clients[topic] = make(map[chan string]bool)
 	}
@@ -43,12 +46,15 @@ func (n *Notification) Subscribe(topic string, client chan string) {
 }
 
 // 2. 發送通知
-func (n *Notification) Notify(topic, message string) {
-	if clients, ok := n.clients[topic]; ok {
-		for ch := range clients { // 遍歷所有訂閱者
+func (n *NotificationManager) Publish(room_id string, message string) {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+
+	if clients, ok := n.clients[room_id]; ok {
+		for client := range clients {
 			select {
-			case ch <- message:
-			default: // channel滿了就跳過
+			case client <- message: // 非阻塞發送
+			default: // 客戶端緩衝滿，忽略
 			}
 		}
 	}
