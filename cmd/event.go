@@ -12,3 +12,7 @@ func (h *Handler) ServeNotification(c *gin.Context) {
 
 	// SSE/WebSocket 長連接...
 }
+
+func (h *Handler) adminNotificationHandler(c *gin.Context) {
+
+}

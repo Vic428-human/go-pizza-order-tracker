@@ -33,6 +33,8 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 		admin.POST("/order/:id/update", h.handleOrderPut)
 		// 透過 id 來刪除訂單
 		admin.POST("/order/:id/delete", h.handleOrderDelete)
+		// 顧客送出添加訂單publish後，通知 admin
+		admin.GET("/notifications", h.adminNotificationHandler)
 	}
 
 	// ====== TMPL 版本 ====== 把數據直接交付給 templtate
