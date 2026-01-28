@@ -98,6 +98,9 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 	}
 	slog.Info("Order created", "orderId", order.ID, "customer", order.CustomerName)
 
+	// 發送通知
+	h.Notification.Publish("admin:new_orders", "new_order")
+
 	// 請求的資源可用，並且應該獲取 https://blog.csdn.net/weixin_42073635/article/details/143805554
 	// c.Redirect(statusCode, location)
 	c.Redirect(http.StatusSeeOther, "/customer/"+order.ID)
