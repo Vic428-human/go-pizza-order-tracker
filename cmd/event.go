@@ -2,12 +2,14 @@ package main
 
 import (
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) GetNotificationsFromAdmin(c *gin.Context) {
+// 通知顧客，當前這筆訂單狀態剛剛改變
+func (h *Handler) StreamOrderNotifications(c *gin.Context) {
 	orderId := c.Query("orderId")
 	client := make(chan string)
 
@@ -30,16 +32,30 @@ func (h *Handler) GetNotificationsFromAdmin(c *gin.Context) {
 	// 不管這個函數從哪裡 return（400、404、或是正常跑完 SSE），進入 defer 的 code 一定會在函數結束前執行一次。
 	defer func() {
 		h.Notification.Unsubscribe(topic, client)
+		slog.Info("Unsubscribed from topic", "orderId", topic)
 	}()
 
-	// SSE/WebSocket 長連接...訂閱後的固定寫法
 	h.streamSSE(c, client)
 }
 
-func (h *Handler) adminNotificationHandler(c *gin.Context) {
+// 通知 ADMIN 有新的訂單請求
+func (h *Handler) StreamNewOrderNotifications(c *gin.Context) {
+	topic := "admin:new_orders"
 
+	client := make(chan string, 10)
+
+	h.Notification.Subscribe(topic, client)
+
+	// 不管這個函數從哪裡 return（400、404、或是正常跑完 SSE），進入 defer 的 code 一定會在函數結束前執行一次。
+	defer func() {
+		h.Notification.Unsubscribe(topic, client)
+		slog.Info("Unsubscribed from topic", "orderId", topic)
+	}()
+
+	h.streamSSE(c, client)
 }
 
+// SSE/WebSocket 長連接...訂閱後的固定寫法
 func (h *Handler) streamSSE(c *gin.Context, client chan string) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
