@@ -93,6 +93,8 @@ func (h *Handler) handleOrderPut(c *gin.Context) {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
+	topic := "order:" + orderID
+	h.Notification.Publish(topic, "訂單狀態已更新成 : "+newStatus)
 
 	// 更新狀態成功
 	c.Redirect(http.StatusSeeOther, "/admin")
