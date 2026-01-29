@@ -29,7 +29,7 @@ clients map[string]map[chan string]bool = {
 	},
 }
 */
-func NewNotification() *NotificationManager {
+func NewNotificationManager() *NotificationManager {
 	return &NotificationManager{clients: make(map[string]map[chan string]bool)}
 }
 

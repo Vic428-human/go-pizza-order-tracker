@@ -19,7 +19,7 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	router.GET("/customer/:id", h.serveCustomer)
 
 	// 客戶端訂閱特定訂單的通知，並在管理員更新訂單狀態時即時推送訊息。
-	router.GET("/notifications", h.StreamOrderNotifications)
+	router.GET("/notifications", h.notificationHandler)
 
 	// ====== React 版本 ======
 
