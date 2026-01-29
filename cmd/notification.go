@@ -13,21 +13,21 @@ type NotificationManager struct {
 }
 
 /* clients: make(map[string]map[chan string]bool)
-// 當有新訂單事件發生時，系統只需遍歷對應主題的 channel 清單，即可只推送給相關訂單的客戶端，避免浪費資源全域廣播。
-// 這種巢狀 map[string]map[chan string]bool 結構實現多播通知（Pub/Sub Pattern）：
-	clients map[string]map[chan string]bool = {
-		"order-123": { // 頻道名稱 (TOPIC)
-			// 該群組內所有客戶端的 channel，當消息有發布的時候，只有下列這些client有訂閱過該頻道(TOPIC)的才會收到訊息
-			0xc0000a4000: true,
-			0xc0000a4060: true,
-		},
-		"order-456": {
-			0xc0000a40c0: true,
-		},
-		"admin:new_orders": {
-			0xc0000a4180: true,
-		},
-	}
+當有新訂單事件發生時，系統只需遍歷對應主題的 channel 清單，即可只推送給相關訂單的客戶端，避免浪費資源全域廣播。
+這種巢狀 map[string]map[chan string]bool 結構實現多播通知（Pub/Sub Pattern）：
+clients map[string]map[chan string]bool = {
+	"order-123": { // 頻道名稱 (TOPIC)
+		// 該群組內所有客戶端的 channel，當消息有發布的時候，只有下列這些client有訂閱過該頻道(TOPIC)的才會收到訊息
+		0xc0000a4000: true,
+		0xc0000a4060: true,
+	},
+	"order-456": {
+		0xc0000a40c0: true,
+	},
+	"admin:new_orders": {
+		0xc0000a4180: true,
+	},
+}
 */
 func NewNotification() *NotificationManager {
 	return &NotificationManager{clients: make(map[string]map[chan string]bool)}
