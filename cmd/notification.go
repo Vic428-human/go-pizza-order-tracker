@@ -33,10 +33,6 @@ func NewNotification() *NotificationManager {
 	return &NotificationManager{clients: make(map[string]map[chan string]bool)}
 }
 
-// 2.支援動態訂閱/取消
-// 客戶端訂閱 => n.clients["order-123"][0xc0000a4000] = true
-// 客戶端斷線時清理 => delete(n.clients["order-123"], 0xc0000a4000)
-
 // 1. 訂閱頻道
 func (n *NotificationManager) Subscribe(topic string, client chan string) {
 	n.mu.Lock()         // 🔒 上鎖

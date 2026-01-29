@@ -17,7 +17,9 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	router.GET("/", h.ServeNewOrderForm)
 	router.POST("/new-order", h.HandleNewOrderPost)
 	router.GET("/customer/:id", h.serveCustomer)
-	router.GET("/notifications", h.GetNotificationsFromAdmin)
+
+	// 客戶端訂閱特定訂單的通知，並在管理員更新訂單狀態時即時推送訊息。
+	router.GET("/notifications", h.StreamOrderNotifications)
 
 	// ====== React 版本 ======
 
@@ -29,12 +31,12 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 	admin.Use(h.AuthMiddleware())
 	{
 		admin.GET("", h.ServeAdminDashboard)
-		//透過 id 來更新訂單
+		// admin 更新訂單狀態
 		admin.POST("/order/:id/update", h.handleOrderPut)
-		// 透過 id 來刪除訂單
+		// admin 刪除訂單
 		admin.POST("/order/:id/delete", h.handleOrderDelete)
-		// 顧客送出添加訂單publish後，通知 admin
-		admin.GET("/notifications", h.adminNotificationHandler)
+		// client 新增訂單, admin 接收訊息
+		admin.GET("/notifications", h.StreamNewOrderNotifications)
 	}
 
 	// ====== TMPL 版本 ====== 把數據直接交付給 templtate
