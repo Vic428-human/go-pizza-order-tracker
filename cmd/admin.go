@@ -94,7 +94,7 @@ func (h *Handler) handleOrderPut(c *gin.Context) {
 		return
 	}
 	topic := "order:" + orderID
-	h.Notification.Publish(topic, "訂單狀態已更新成 : "+newStatus)
+	h.notificationManager.Publish(topic, "訂單狀態已更新成 : "+newStatus)
 
 	// 更新狀態成功
 	c.Redirect(http.StatusSeeOther, "/admin")
