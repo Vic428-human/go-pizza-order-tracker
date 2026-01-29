@@ -48,6 +48,21 @@ func (n *NotificationManager) Subscribe(topic string, client chan string) {
 	n.clients[topic][client] = true
 }
 
+// 2. 取消訂閱頻道
+func (n *NotificationManager) Unsubscribe(topic string, client chan string) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if clients, ok := n.clients[topic]; ok {
+		delete(clients, client)
+	}
+
+	if len(n.clients[topic]) == 0 {
+		delete(n.clients, topic)
+	}
+
+	close(client)
+}
+
 // 2. 對特定頻道發送通知
 func (n *NotificationManager) Publish(room_id string, message string) {
 	n.mu.RLock()
