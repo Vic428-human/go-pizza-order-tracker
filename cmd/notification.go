@@ -2,29 +2,29 @@ package main
 
 import "sync"
 
+/*
+RWMutex (讀寫鎖)：區分「讀」和「寫」兩種操作：
+讀鎖 (RLock)：允許多個 goroutine 同時讀取資源，只要沒有 goroutine 在寫。
+寫鎖 (Lock)：只允許一個 goroutine 寫入資源，並且會阻塞所有其他的讀和寫。
+*/
 type NotificationManager struct {
 	clients map[string]map[chan string]bool
-	mu      sync.RWMutex
+	mu      sync.RWMutex // 讀寫鎖 (Read-Write Mutex)
 }
 
-/*
-// 1. 按主題分組推送
+/* clients: make(map[string]map[chan string]bool)
 // 當有新訂單事件發生時，系統只需遍歷對應主題的 channel 清單，即可只推送給相關訂單的客戶端，避免浪費資源全域廣播。
 // 這種巢狀 map[string]map[chan string]bool 結構實現多播通知（Pub/Sub Pattern）：
-
 	clients map[string]map[chan string]bool = {
-		// 代表通知主題或事件類型 => 外層 key（如 "order-123"、"admin:new_orders"）
-		// 可能是用戶ID、session ID 或 room ID（群組識別）
-		"order-123": { // 內層 map，好處：訂單123更新時，只通知兩個相關客戶端，不會打擾其他用戶。
-			// 儲存該主題下所有感興趣的客戶端 channel，bool 作為簡單存在標記（避免重複註冊）
+		"order-123": { // 頻道名稱 (TOPIC)
+			// 該群組內所有客戶端的 channel，當消息有發布的時候，只有下列這些client有訂閱過該頻道(TOPIC)的才會收到訊息
 			0xc0000a4000: true,
-			// 該群組內所有客戶端的 channel
 			0xc0000a4060: true,
 		},
-		"order-456": { // 只有追蹤訂單456的客戶端
+		"order-456": {
 			0xc0000a40c0: true,
 		},
-		"admin:new_orders": { // 管理員全域訂單通知
+		"admin:new_orders": {
 			0xc0000a4180: true,
 		},
 	}
@@ -37,15 +37,18 @@ func NewNotification() *NotificationManager {
 // 客戶端訂閱 => n.clients["order-123"][0xc0000a4000] = true
 // 客戶端斷線時清理 => delete(n.clients["order-123"], 0xc0000a4000)
 
-// 1. 客戶端連線時註冊
+// 1. 訂閱頻道
 func (n *NotificationManager) Subscribe(topic string, client chan string) {
-	if n.clients[topic] == nil {
+	n.mu.Lock()         // 🔒 上鎖
+	defer n.mu.Unlock() // 🔓 自動解鎖
+
+	if n.clients[topic] == nil { // ⚠️ Race Condition，使用 Lock 跟 Unlock 就不會有這問題
 		n.clients[topic] = make(map[chan string]bool)
 	}
 	n.clients[topic][client] = true
 }
 
-// 2. 發送通知
+// 2. 對特定頻道發送通知
 func (n *NotificationManager) Publish(room_id string, message string) {
 	n.mu.RLock()
 	defer n.mu.RUnlock()
