@@ -27,7 +27,7 @@ func (h *Handler) HandleLoginGet(c *gin.Context) {
 
 func (h *Handler) HandleLoginPost(c *gin.Context) {
 	var form struct {
-		Username string `form:"username" binding:"required,min=3,max=50"`
+		Account  string `form:"account" binding:"required,min=3,max=50"`
 		Password string `form:"password" binding:"required,min=6"`
 	}
 
@@ -37,7 +37,7 @@ func (h *Handler) HandleLoginPost(c *gin.Context) {
 		return
 	}
 
-	user, err := h.users.AuthenticateUser(form.Username, form.Password)
+	user, err := h.users.AuthenticateUser(form.Account, form.Password)
 
 	//規則正確，但登入資訊錯誤
 	if err != nil {

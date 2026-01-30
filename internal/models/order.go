@@ -28,7 +28,7 @@ import (
 
 // 修改後
 var (
-	OrderStatues = []string{"Order placed", "Preparing", "Baking", "Quality Check", "Ready"}
+	OrderStatues = []string{"已成功下單", "製作中", "已完成（待交付)", "交付失敗／逾期", "已交付（完成交貨)"}
 
 	PizzaTypes = []string{
 		"黃色纖細藥水",
