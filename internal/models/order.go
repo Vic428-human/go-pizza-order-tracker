@@ -7,21 +7,39 @@ import (
 	"gorm.io/gorm"
 )
 
+// 修改前
+// var (
+// 	//  {{range $index, $status := .Statuses}}
+// 	OrderStatues = []string{"Order placed", "Preparing", "Baking", "Quality Check", "Ready"}
+
+// 	PizzaTypes = []string{
+// 		"Cheese",
+// 		"Pepperoni",
+// 		"Veggie",
+// 	}
+// 	// PizzaSizes 可以在 order.tmpl 的時候使用 透過 {{ range .PizzaSizes }}
+// 	PizzaSizes = []string{
+// 		"Small",
+// 		"Medium",
+// 		"Large",
+// 		"Extra Large",
+// 	}
+// )
+
+// 修改後
 var (
-	//  {{range $index, $status := .Statuses}}
 	OrderStatues = []string{"Order placed", "Preparing", "Baking", "Quality Check", "Ready"}
 
 	PizzaTypes = []string{
-		"Cheese",
-		"Pepperoni",
-		"Veggie",
+		"黃色纖細藥水",
+		"白色纖細藥水",
 	}
 	// PizzaSizes 可以在 order.tmpl 的時候使用 透過 {{ range .PizzaSizes }}
 	PizzaSizes = []string{
-		"Small",
-		"Medium",
-		"Large",
-		"Extra Large",
+		"半倉",
+		"一倉",
+		"兩倉",
+		"零售",
 	}
 )
 
