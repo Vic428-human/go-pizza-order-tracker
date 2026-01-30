@@ -19,11 +19,8 @@
         <div id="statusContainer"
             class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-2xl border border-white/20 max-w-3xl w-full">
             <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 text-center tracking-tight">
-                Track Your Pizza Order
+                追蹤 #{{.Order.ID}} 的訂單狀態
             </h1>
-            <div class="text-lg text-gray-500 mb-10 text-center font-medium">
-                Order #{{.Order.ID}}
-            </div>
             <p class="text-red-700">若你的訂單狀態處在 交付失敗／逾期，請主動聯繫賣家，賣家會再告知你下一步指示</p>
             <div class="relative flex justify-between items-center mb-4">
                 <div id="progressLine"
@@ -78,7 +75,8 @@
                             </div>
                             <div class="md:col-span-2">
                                 <p class="text-sm text-gray-500 mb-1">Special Instructions</p>
-                                <p class="font-semibold text-gray-900">{{if $pizza.Instructions}}{{$pizza.Instructions}}{{else}}None{{end}}</p>
+                                <p class="font-semibold text-gray-900">{{if
+                                    $pizza.Instructions}}{{$pizza.Instructions}}{{else}}None{{end}}</p>
                             </div>
                         </div>
                     </div>
@@ -94,15 +92,25 @@
         function updateStatusBar(currentStatus) {
             const currentIndex = statuses.indexOf(currentStatus)
             statuses.forEach((status, index) => {
-                const step = document.getElementById(`step${index+1}`);
-                if(index <= currentIndex) {
-                    step.classList.remove("bg-gray-300")
-                    step.classList.add("bg-emerald-500")
+                const step = document.getElementById(`step${index + 1}`);
+                if (!step) return;
+
+                if (index <= currentIndex) {
+                    step.classList.remove("bg-gray-300");
+
+                    // 只有 currentIndex 為 3 且當前步驟也是第3時才變红
+                    if (currentIndex === 3 && index === 3) {
+                        step.classList.remove("bg-emerald-500");
+                        step.classList.add("bg-pink-500");
+                    } else {
+                        step.classList.remove("bg-pink-500");
+                        step.classList.add("bg-emerald-500");
+                    }
                 }
-            })
+            });
 
             const progressLine = document.getElementById("progressLine");
-            const progressPercentage = Math.max(currentIndex / (statuses.length - 1 ) * 100, 5)
+            const progressPercentage = Math.max(currentIndex / (statuses.length - 1) * 100, 5)
             progressLine.style.background = `linear-gradient(to right, #10b981 ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`;
         }
 
