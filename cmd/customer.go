@@ -124,7 +124,7 @@ func (h *Handler) serveCustomer(c *gin.Context) {
 
 	// 如果資料庫有訂單，以 tmpl 呈現給前端
 	c.HTML(http.StatusOK, "customer.tmpl", CustomerData{
-		Title:    "Pizza Tracker - 訂單詳情" + orderID,
+		Title:    "仙境傳說接單系統" + orderID,
 		Order:    *order,
 		Statuses: models.OrderStatues, // {{range $index, $status := .Statuses}}
 		// .Statuses：代表傳入模板的資料結構中，名為 Statuses 的欄位（通常是一個 slice）
