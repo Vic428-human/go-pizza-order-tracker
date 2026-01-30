@@ -24,7 +24,7 @@ type OrderFormData struct { // 定義 從 models 取得披薩種類與尺寸的�
 // dive 是 go-playground/validator 提供的特殊標籤，它用於啟用對 slice/array/map 內部元素的遞歸驗證，若結構體中包含嵌套的切片或數組，且需要驗證其內部字段，必須加上 dive，否則只會驗證外層容器本身（如長度），不會驗證內部元素的字段。
 type OrderReuqest struct {
 	Name         string   `form:"name" binding:"required,min=2,max=100"`
-	Phone        string   `form:"phone" binding:"required,min=10,max=20"`
+	Phone        string   `form:"phone" binding:"required,max=20"`
 	Address      string   `form:"address" binding:"required,min=5,max=200"`
 	Sizes        []string `form:"size" binding:"required,min=1,dive,valid_pizza_size"`
 	PizzaTypes   []string `form:"pizza" binding:"required,min=1,dive,valid_pizza_type"`

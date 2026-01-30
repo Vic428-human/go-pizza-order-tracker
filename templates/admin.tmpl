@@ -1,5 +1,5 @@
 {{template "top" .}}
-<title>Admin Dashboard - Pizza tracker </title>
+<title>今日訂單</title>
 </head>
 
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
@@ -8,31 +8,32 @@
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">
-                        Pizza Tracker
+                        訂單管理
                     </h1>
                     <p class="text-gray-600 text-lg">Track and manage all your pizza orders</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-gray-700 font-medium">
-                        Welcome, {{.Username}}
+                        歡迎回來, {{.Username}}
                     </span>
                     <form action="/logout" method="POST">
                         <button type="submit"
                             class="px-5 py-2.5 bg-red-500 text-white text-sm  rounded-xl hover:bg-red-600 active:scale-95 transition-all shadow-sm">Logout</button>
                     </form>
-
                 </div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
                 <div class="p-6 md:p-8">
                     <div class="flex items-center mb-8">
-                        <h2 class="text-2xl font-semibold text-gray-900 mr-2">Active Orders</h2>
+                        <h2 class="text-2xl font-semibold text-gray-900 mr-2">待處理訂單</h2>
                         <button onclick="location.reload()"
                             class="text-gray-500 hover:text-gray-700 transition-colors ml-2 p-1.5 rounded-lg hover:bg-gray-100">
                             <span class="text-xl">🔄</span>
                         </button>
                         <span id="lastFetched" class="text-sm text-gray-500 ml-4 font-medium"></span>
-                        <span id="newOrdersBadge" class="ml-2 text-xs font-semibold text-white bg-red-500 rounded-full px-3 py-1.5 hidden shadow-sm">0 new orders</span>
+                        <span id="newOrders"
+                            class="ml-2 text-xs font-semibold text-white bg-green-500 rounded-full px-3 py-1.5 shadow-sm">0
+                            筆</span>
                     </div>
                     <div class="w-full overflow-x-auto rounded-xl border border-gray-200">
                         <table class="w-full">
@@ -40,25 +41,25 @@
                                 <tr class="bg-gray-50/80 border-b border-gray-200">
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Order ID</th>
+                                        訂單編號</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Status</th>
+                                        狀態</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Name</th>
+                                        遊戲暱稱</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Phone</th>
+                                        聯絡方式</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Address</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Pizzas</th>
+                                        道具名稱</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Actions</th>
+                                        切換製作進度</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white/70 divide-y divide-gray-100">
@@ -93,7 +94,8 @@
                                         <div class="flex gap-2">
                                             <form action="/admin/order/{{.ID}}/update" method="POST">
                                                 <select name="status"
-                                                    class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all bg-white font-medium" onchange="this.form.submit()">
+                                                    class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all bg-white font-medium"
+                                                    onchange="this.form.submit()">
                                                     {{$currentStatus := .Status}}
                                                     {{range $.Statuses}}
                                                     <option {{if eq . $currentStatus}} selected {{end}} value="{{.}}">
@@ -123,24 +125,26 @@
             </div>
         </div>
     </div>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const updateTime = () => `Last updated on: ${new Date().toLocaleString()}`
-        const lastFetched = document.getElementById("lastFetched");
-        const newOrdersBadge = document.getElementById("newOrdersBadge")
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const updateTime = () => `上一次更新: ${new Date().toLocaleString()}`
+            const lastFetched = document.getElementById("lastFetched");
+            const newOrders = document.getElementById("newOrders")
 
-        lastFetched.textContent = updateTime();
-
-        let newOrdersCount = 0;
-        const eventSrc = new EventSource("/admin/notifications");
-        eventSrc.onmessage = e => {
-            newOrdersCount++;
-            newOrdersBadge.textContent = `${newOrdersCount} new order${newOrdersCount === 1 ? '' : 's'}`
-            newOrdersBadge.classList.remove("hidden");
             lastFetched.textContent = updateTime();
-        }
-        eventSrc.onerror = err => console.error("EventSource fialed:", err)
-    })
-</script>
-{{template "bottom" .}}
+
+            let newOrdersCount = 0;
+            const eventSrc = new EventSource("/admin/notifications");
+            eventSrc.onmessage = e => {
+                newOrdersCount++;
+                newOrders.textContent = `${newOrdersCount} new order${newOrdersCount === 1 ? '' : 's'}`
+                newOrders.classList.remove("hidden");
+                newOrders.classList.replace("bg-green-500", "bg-red-500");
+
+                lastFetched.textContent = updateTime();
+            }
+            eventSrc.onerror = err => console.error("EventSource fialed:", err)
+        })
+    </script>
+    {{template "bottom" .}}
