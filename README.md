@@ -1,6 +1,10 @@
 ### 檔案架構
 > 本專案前期使用 go template 來呈現前端的UI效果，後期會另外添加React UI模板。這部分有時間才會陸續迭代，但主軸還是圍繞著go template 跟 gin gorm等候端API規畫的製作上，所以如果只是想看DEMO，以go template主就好
 
+0213 更新
+> 剛實驗過把後端 go new-order 新增訂單的部分，從原本只回傳 go template 跟改成先從DB
+> 拿到資料後，再回傳json。接下來要在前端頁面，把之前 預約訂單填寫表 的UI，放在react 首頁上，然後實驗按下 place oder後，是否可以正常觸發後端API，若可以代碼第一階段 前端跟後端有對接上。
+
 ```code
 yourproject/
 ├── go.mod
