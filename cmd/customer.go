@@ -101,9 +101,28 @@ func (h *Handler) HandleNewOrderPost(c *gin.Context) {
 	// 發送通知
 	h.notificationManager.Publish("admin:new_orders", "new_order")
 
+	// ❌ 現在的寫法（導向 HTML）
 	// 請求的資源可用，並且應該獲取 https://blog.csdn.net/weixin_42073635/article/details/143805554
 	// c.Redirect(statusCode, location)
-	c.Redirect(http.StatusSeeOther, "/customer/"+order.ID)
+	// c.Redirect(http.StatusSeeOther, "/customer/"+order.ID)
+	// ✅ 回傳 JSON 而不是 redirect
+	// ✅ 完整回傳新建立的訂單所有細節
+
+	/*
+			{
+		  "name": "俊祥",
+		  "phone": "aabbccdd",
+		  "address": "sigrun",
+		  "sizes": ["半倉","一倉"],
+		  "pizzaTypes": ["黃色纖細藥水", "白色纖細藥水"],  //
+		  "instructions": ["5456", "加起司"]
+		}
+	*/
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"orderId": order.ID,
+		"order":   order, // ← 直接回傳完整的 order struct
+	})
 
 }
 

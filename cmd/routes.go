@@ -15,6 +15,7 @@ func setupRoutes(router *gin.Engine, h *Handler, store gormsessions.Store) {
 
 	// ====== TMPL 版本 ======
 	router.GET("/", h.ServeNewOrderForm)
+	// 0213 有模擬不回傳 go template 而是回傳DB給我的json數據
 	router.POST("/new-order", h.HandleNewOrderPost)
 	router.GET("/customer/:id", h.serveCustomer)
 
